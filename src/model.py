@@ -16,6 +16,8 @@ from src.metrics.metrics import (
     model_avg_distance,
 )
 
+from config.config import GRID_WIDTH, GRID_HEIGHT, NUM_ZOMBIES, NUM_OBSTACLES, RANDOM_SEED, MAX_STEPS
+
 
 class ZombieSurvivalModel(Model):
     """
@@ -31,13 +33,13 @@ class ZombieSurvivalModel(Model):
     def __init__(
         self,
         *,
-        width=12,
-        height=12,
-        num_zombies=4,
-        num_obstacles=12,
-        max_steps=80,
+        width=GRID_WIDTH,
+        height=GRID_HEIGHT,
+        num_zombies=NUM_ZOMBIES,
+        num_obstacles=NUM_OBSTACLES,
+        max_steps=MAX_STEPS,
         team_mode="baseline",
-        seed=None,
+        seed=RANDOM_SEED,
     ):
         super().__init__(rng=seed)
 
@@ -53,8 +55,16 @@ class ZombieSurvivalModel(Model):
 
         self.grid = MultiGrid(width, height, torus=False)
 
+        self.safe_zone_positions = [
+            (width - 2, height - 2),
+            (width - 1, height - 2),
+            (width - 2, height - 1),
+            (width - 1, height - 1),
+        ]
+
         self.safe_zone_pos = (width - 1, height - 1)
-        self.safe_zone_agent = None
+
+        self.safe_zone_agents = []
 
         # Reservar posições iniciais da equipa
         self.start_positions = [
@@ -87,16 +97,17 @@ class ZombieSurvivalModel(Model):
     # ==============================
 
     def create_safe_zone(self):
-        safe_zone = SafeZoneAgent(self)
-        self.grid.place_agent(safe_zone, self.safe_zone_pos)
-        self.safe_zone_agent = safe_zone
+        for pos in self.safe_zone_positions:
+            safe_zone = SafeZoneAgent(self)
+            self.grid.place_agent(safe_zone, pos)
+            self.safe_zone_agents.append(safe_zone)
 
     def create_obstacles(self):
         created = 0
 
         while created < self.num_obstacles:
             pos = self.random_empty_position(
-                forbidden_positions=set(self.start_positions + [self.safe_zone_pos])
+                forbidden_positions=set(self.start_positions + self.safe_zone_positions)
             )
 
             obstacle = ObstacleAgent(self)
@@ -261,7 +272,7 @@ class ZombieSurvivalModel(Model):
 
     def is_successful(self):
         return any(
-            survivor.alive and survivor.pos == self.safe_zone_pos
+            survivor.alive and survivor.pos in self.safe_zone_positions
             for survivor in self.get_alive_survivors()
         )
 

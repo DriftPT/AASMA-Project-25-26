@@ -7,7 +7,7 @@ from src.model import ZombieSurvivalModel
 from src.agents.survivor_agents import ScoutAgent, DefenderAgent, SupportAgent, AdaptiveAgent
 from src.agents.zombie_agent import ZombieAgent
 from src.agents.environment_agents import ObstacleAgent, SafeZoneAgent
-
+from config.config import GRID_HEIGHT, GRID_WIDTH, MAX_STEPS, NUM_OBSTACLES, NUM_ZOMBIES, RANDOM_SEED
 
 # ==============================
 # GLOBAL REACTIVE STATE
@@ -21,13 +21,13 @@ is_playing = solara.reactive(False)
 
 model_state = solara.reactive(
     ZombieSurvivalModel(
-        width=12,
-        height=12,
-        num_zombies=4,
-        num_obstacles=12,
-        max_steps=80,
+        width=GRID_WIDTH,
+        height=GRID_HEIGHT,
+        num_zombies=NUM_ZOMBIES,
+        num_obstacles=NUM_OBSTACLES,
+        max_steps=MAX_STEPS,
         team_mode="baseline",
-        seed=42,
+        seed=RANDOM_SEED,
     )
 )
 
@@ -47,13 +47,13 @@ def force_refresh():
 def reset_model():
     is_playing.value = False
     model_state.value = ZombieSurvivalModel(
-        width=12,
-        height=12,
-        num_zombies=4,
-        num_obstacles=12,
-        max_steps=80,
+        width=GRID_WIDTH,
+        height=GRID_HEIGHT,
+        num_zombies=NUM_ZOMBIES,
+        num_obstacles=NUM_OBSTACLES,
+        max_steps=MAX_STEPS,
         team_mode=team_mode.value,
-        seed=42,
+        seed=RANDOM_SEED,
     )
 
     force_refresh()
