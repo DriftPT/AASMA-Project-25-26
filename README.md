@@ -93,9 +93,6 @@ pip install -r requirements.txt
 ## Running the Experiments
 
 To run the experiments without visualization:
-```bash
-cd src
-```
 
 ```bash
 python main.py
