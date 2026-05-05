@@ -271,9 +271,18 @@ class ZombieSurvivalModel(Model):
     # ==============================
 
     def is_successful(self):
-        return any(
-            survivor.alive and survivor.pos in self.safe_zone_positions
-            for survivor in self.get_alive_survivors()
+        """
+        The mission is successful only when all alive survivors
+        have reached one of the safe zone cells.
+        """
+        alive_survivors = self.get_alive_survivors()
+
+        if len(alive_survivors) == 0:
+            return False
+
+        return all(
+            survivor.pos in self.safe_zone_positions
+            for survivor in alive_survivors
         )
 
     def update_finished_status(self):

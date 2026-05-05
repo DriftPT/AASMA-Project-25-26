@@ -85,101 +85,229 @@ class SurvivorAgent(Agent):
         return False
 
     def check_safe_zone(self):
-        if self.pos == self.model.safe_zone_pos:
+        if self.pos in self.model.safe_zone_positions:
             self.reached_safe_zone = True
+    
+    def stay_if_reached_safe_zone(self) -> bool:
+        """
+        If the survivor has reached the safe zone, it stays there.
+        This prevents agents from leaving the safe zone while waiting
+        for the rest of the team.
+        """
+        if self.pos in self.model.safe_zone_positions:
+            self.reached_safe_zone = True
+            self.last_action = Action.WAIT
+            return True
+
+        return False
+
+    # ======================================================
+    # Shared team behaviour helpers
+    # ======================================================
+
+    def get_team_goal(self):
+        """
+        Returns the current team goal.
+
+        The Scout can create/update this shared intention.
+        If no Scout has acted yet, the default goal is still the safe zone.
+        """
+        return getattr(self.model, "team_goal_pos", self.model.safe_zone_pos)
+
+    def call_team_to_safe_zone(self):
+        """
+        Simple implicit communication mechanism.
+
+        When the Scout decides that the best plan is to reach the safe zone,
+        it stores that goal in the model. Other agents can read it and follow.
+        """
+        self.model.team_goal_pos = self.model.safe_zone_pos
+        self.model.team_leader_pos = self.pos
+
+    def nearby_zombie(self, max_distance: int):
+        nearest_zombie = self.model.nearest_zombie(self.pos)
+
+        if nearest_zombie is None:
+            return None
+
+        if manhattan_distance(self.pos, nearest_zombie.pos) <= max_distance:
+            return nearest_zombie
+
+        return None
+
+    def teammate_threatened_by_zombie(self, max_distance: int = 1):
+        """
+        Returns a zombie that is threatening any alive teammate.
+        Used mainly by the Defender.
+        """
+        threatened_zombies = []
+
+        for zombie in self.model.get_alive_zombies():
+            for survivor in self.model.get_alive_survivors():
+                if survivor == self:
+                    continue
+
+                if manhattan_distance(zombie.pos, survivor.pos) <= max_distance:
+                    threatened_zombies.append(zombie)
+                    break
+
+        if not threatened_zombies:
+            return None
+
+        return min(
+            threatened_zombies,
+            key=lambda zombie: manhattan_distance(self.pos, zombie.pos)
+        )
+
+    def move_safely_towards(self, target_pos):
+        """
+        Moves one cell toward a target, but avoids moves that place the agent
+        next to a zombie when possible.
+        """
+        x, y = self.pos
+        candidates = [
+            (x + 1, y),
+            (x - 1, y),
+            (x, y + 1),
+            (x, y - 1),
+        ]
+
+        valid_moves = [pos for pos in candidates if self.model.can_move_to(pos)]
+
+        if not valid_moves:
+            self.last_action = Action.WAIT
+            return
+
+        def zombie_risk(pos):
+            zombies = self.model.get_alive_zombies()
+            if not zombies:
+                return 0
+            return min(manhattan_distance(pos, zombie.pos) for zombie in zombies)
+
+        current_distance = manhattan_distance(self.pos, target_pos)
+
+        progress_moves = [
+            pos for pos in valid_moves
+            if manhattan_distance(pos, target_pos) < current_distance
+        ]
+
+        if progress_moves:
+            valid_moves = progress_moves
+
+        # Prefer progress toward the target and avoid zombie-adjacent cells.
+        best_distance = min(manhattan_distance(pos, target_pos) for pos in valid_moves)
+        best_moves = [
+            pos for pos in valid_moves
+            if manhattan_distance(pos, target_pos) == best_distance
+        ]
+
+        safe_moves = [pos for pos in best_moves if zombie_risk(pos) > 1]
+
+        if safe_moves:
+            best_moves = safe_moves
+
+        new_pos = self.model.random.choice(best_moves)
+        self.move_to(new_pos)
+
+    def follow_team_goal(self):
+        self.move_safely_towards(self.get_team_goal())
+        self.check_safe_zone()
 
 
 class ScoutAgent(SurvivorAgent):
     """
     Scout:
-    - focuses on moving safely toward the safe zone;
+    - leads the team toward the safe zone;
+    - calls teammates to follow the safe-zone objective;
     - avoids zombies when they are too close;
-    - does not actively fight unless necessary.
+    - only stops progressing when survival requires it.
     """
 
     def __init__(self, model):
         super().__init__(model, role_name="Scout", symbol="C")
 
     def step(self):
-        if not self.alive or self.model.finished:
+        if not self.alive or self.model.finished or self.stay_if_reached_safe_zone():
             return
+
+        # The Scout acts as a leader: it announces the shared objective.
+        self.call_team_to_safe_zone()
 
         nearest_zombie = self.model.nearest_zombie(self.pos)
 
         if nearest_zombie is not None:
             distance = manhattan_distance(self.pos, nearest_zombie.pos)
 
+            # If a zombie is adjacent, escaping has priority over moving forward.
             if distance <= 1:
                 new_pos = move_away_from(self.pos, nearest_zombie.pos)
-                self.move_to(new_pos)
+
+                if self.model.can_move_to(new_pos):
+                    self.move_to(new_pos)
+                else:
+                    # If escaping is blocked, attack only as a last resort.
+                    attacked = self.attack_nearby_zombie()
+                    if not attacked:
+                        self.last_action = Action.WAIT
+
                 self.check_safe_zone()
                 return
 
-        new_pos = move_towards(self.pos, self.model.safe_zone_pos)
-        self.move_to(new_pos)
-        self.check_safe_zone()
+        self.follow_team_goal()
 
 
 class DefenderAgent(SurvivorAgent):
     """
     Defender:
-    - attacks nearby zombies;
-    - moves toward zombies that are close;
-    - otherwise stays near teammates.
+    - protects the team from immediate threats;
+    - attacks adjacent zombies;
+    - intercepts zombies that are threatening teammates;
+    - otherwise follows the Scout/team goal toward the safe zone.
     """
 
     def __init__(self, model):
         super().__init__(model, role_name="Defender", symbol="D")
 
     def step(self):
-        if not self.alive or self.model.finished:
+        if not self.alive or self.model.finished or self.stay_if_reached_safe_zone():
             return
 
+        # Direct danger: fight because there is no safe alternative.
         attacked = self.attack_nearby_zombie()
-
         if attacked:
+            self.check_safe_zone()
             return
 
-        nearest_zombie = self.model.nearest_zombie(self.pos)
-
-        if nearest_zombie is not None:
-            distance = manhattan_distance(self.pos, nearest_zombie.pos)
-
-            if distance <= 4:
-                new_pos = move_towards(self.pos, nearest_zombie.pos)
-                self.move_to(new_pos)
-                self.check_safe_zone()
-                return
-
-        nearest_ally = self.model.nearest_survivor(self.pos, exclude=self)
-
-        if nearest_ally is not None:
-            new_pos = move_towards(self.pos, nearest_ally.pos)
+        # Protect teammates only when a zombie is an immediate threat.
+        threatening_zombie = self.teammate_threatened_by_zombie(max_distance=1)
+        if threatening_zombie is not None:
+            new_pos = move_towards(self.pos, threatening_zombie.pos)
             self.move_to(new_pos)
             self.check_safe_zone()
             return
 
-        self.last_action = Action.WAIT
+        # Otherwise, the defender should not chase zombies forever.
+        self.follow_team_goal()
 
 
 class SupportAgent(SurvivorAgent):
     """
     Support:
-    - heals injured teammates;
-    - moves toward injured teammates;
-    - otherwise stays close to the group.
+    - heals nearby injured teammates;
+    - helps injured teammates only when they are close enough;
+    - otherwise follows the Scout/team goal toward the safe zone.
     """
 
     def __init__(self, model):
-        super().__init__(model, role_name="Support", symbol="U")
+        super().__init__(model, role_name="Support", symbol="S")
 
     def step(self):
-        if not self.alive or self.model.finished:
+        if not self.alive or self.model.finished or self.stay_if_reached_safe_zone():
             return
 
         healed = self.heal_nearby_survivor()
-
         if healed:
+            self.check_safe_zone()
             return
 
         injured_survivors = [
@@ -187,26 +315,24 @@ class SupportAgent(SurvivorAgent):
             if survivor != self and survivor.health < survivor.max_health
         ]
 
-        if injured_survivors:
+        # Do not abandon the safe-zone objective for a far-away injured agent.
+        # Support only diverts if the injured teammate is close enough to help.
+        close_injured_survivors = [
+            survivor for survivor in injured_survivors
+            if manhattan_distance(self.pos, survivor.pos) <= 3
+        ]
+
+        if close_injured_survivors:
             target = min(
-                injured_survivors,
+                close_injured_survivors,
                 key=lambda survivor: manhattan_distance(self.pos, survivor.pos)
             )
 
-            new_pos = move_towards(self.pos, target.pos)
-            self.move_to(new_pos)
+            self.move_safely_towards(target.pos)
             self.check_safe_zone()
             return
 
-        nearest_ally = self.model.nearest_survivor(self.pos, exclude=self)
-
-        if nearest_ally is not None:
-            new_pos = move_towards(self.pos, nearest_ally.pos)
-            self.move_to(new_pos)
-            self.check_safe_zone()
-            return
-
-        self.last_action = Action.WAIT
+        self.follow_team_goal()
 
 
 class AdaptiveAgent(SurvivorAgent):
@@ -227,7 +353,7 @@ class AdaptiveAgent(SurvivorAgent):
         self.teammate_scores: Dict[int, Dict[str, int]] = {}
 
     def step(self):
-        if not self.alive or self.model.finished:
+        if not self.alive or self.model.finished or self.stay_if_reached_safe_zone():
             return
 
         self.observe_teammates()
@@ -306,6 +432,9 @@ class AdaptiveAgent(SurvivorAgent):
         return min(roles, key=roles.get)
 
     def scout_behaviour(self):
+        # If the adaptive agent is acting as the Scout, it also calls the team.
+        self.call_team_to_safe_zone()
+
         nearest_zombie = self.model.nearest_zombie(self.pos)
 
         if nearest_zombie is not None:
@@ -313,11 +442,16 @@ class AdaptiveAgent(SurvivorAgent):
 
             if distance <= 1:
                 new_pos = move_away_from(self.pos, nearest_zombie.pos)
-                self.move_to(new_pos)
+
+                if self.model.can_move_to(new_pos):
+                    self.move_to(new_pos)
+                else:
+                    attacked = self.attack_nearby_zombie()
+                    if not attacked:
+                        self.last_action = Action.WAIT
                 return
 
-        new_pos = move_towards(self.pos, self.model.safe_zone_pos)
-        self.move_to(new_pos)
+        self.follow_team_goal()
 
     def defender_behaviour(self):
         attacked = self.attack_nearby_zombie()
@@ -325,14 +459,13 @@ class AdaptiveAgent(SurvivorAgent):
         if attacked:
             return
 
-        nearest_zombie = self.model.nearest_zombie(self.pos)
-
-        if nearest_zombie is not None:
-            new_pos = move_towards(self.pos, nearest_zombie.pos)
+        threatening_zombie = self.teammate_threatened_by_zombie(max_distance=1)
+        if threatening_zombie is not None:
+            new_pos = move_towards(self.pos, threatening_zombie.pos)
             self.move_to(new_pos)
             return
 
-        self.last_action = Action.WAIT
+        self.follow_team_goal()
 
     def support_behaviour(self):
         healed = self.heal_nearby_survivor()
@@ -345,21 +478,18 @@ class AdaptiveAgent(SurvivorAgent):
             if survivor != self and survivor.health < survivor.max_health
         ]
 
-        if injured_survivors:
+        close_injured_survivors = [
+            survivor for survivor in injured_survivors
+            if manhattan_distance(self.pos, survivor.pos) <= 3
+        ]
+
+        if close_injured_survivors:
             target = min(
-                injured_survivors,
+                close_injured_survivors,
                 key=lambda survivor: manhattan_distance(self.pos, survivor.pos)
             )
 
-            new_pos = move_towards(self.pos, target.pos)
-            self.move_to(new_pos)
+            self.move_safely_towards(target.pos)
             return
 
-        nearest_ally = self.model.nearest_survivor(self.pos, exclude=self)
-
-        if nearest_ally is not None:
-            new_pos = move_towards(self.pos, nearest_ally.pos)
-            self.move_to(new_pos)
-            return
-
-        self.last_action = Action.WAIT
+        self.follow_team_goal()

@@ -153,7 +153,7 @@ def Page():
             if model_state.value.finished:
                 is_playing.value = False
 
-            time.sleep(0.7)
+            time.sleep(0.5)
 
     solara.use_thread(play_loop, dependencies=[])
 
