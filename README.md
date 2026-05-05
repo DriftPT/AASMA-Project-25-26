@@ -28,7 +28,7 @@ AASMA-Project-25-26/
 │
 ├── main.py                         # Runs all experiments without visualization
 ├── app.py                          # Mesa/Solara visualization
-├── requirements.txt                 # Python dependencies
+├── requirements.txt                # Python dependencies
 ├── README.md                       # Instructions
 │
 ├── config/
@@ -61,7 +61,7 @@ AASMA-Project-25-26/
 ### 1. Open the terminal in the project folder
 
 ```bash
-cd zombie_mesa_project
+cd AASMA-Project-25-26
 ```
 
 ### 2. Create a virtual environment
@@ -93,9 +93,6 @@ pip install -r requirements.txt
 ## Running the Experiments
 
 To run the experiments without visualization:
-```bash
-cd src
-```
 
 ```bash
 python main.py
