@@ -1,0 +1,6 @@
+mesa[rec]
+solara
+matplotlib
+pandas
+numpy
+ipython

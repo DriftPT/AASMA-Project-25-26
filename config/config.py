@@ -1,0 +1,16 @@
+# ==============================
+# GLOBAL CONFIGURATION
+# ==============================
+
+GRID_WIDTH = 16
+GRID_HEIGHT = 16
+
+NUM_ZOMBIES = 6
+NUM_OBSTACLES = 12
+
+MAX_STEPS = 200
+
+INITIAL_HEALTH = 3
+
+EPISODES = 100
+RANDOM_SEED = 42
