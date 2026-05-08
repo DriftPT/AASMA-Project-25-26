@@ -36,20 +36,14 @@ AASMA-Project-25-26/
 │
 ├── src/
 │   ├── model.py                    # Defines the Mesa model and grid environment
+│   ├── experiments.py              # Defines and runs experiment configurations
+│   ├── metrics.py                  # Metrics and result aggregation
+│   ├── utils.py                    # Utility functions, such as grid distance and movement
 │   │
-│   ├── agents/
-│   │   ├── survivor_agents.py      # Scout, Defender, Support and Adaptive agents
-│   │   ├── zombie_agent.py         # Zombie agent behaviour
-│   │   └── environment_agents.py   # Obstacles and safe zone
-│   │
-│   ├── experiments/
-│   │   └── experiments.py          # Defines and runs experiment configurations
-│   │
-│   ├── metrics/
-│   │   └── metrics.py              # Metrics and result aggregation
-│   │
-│   └── utils/
-│       └── utils.py                # Utility functions, such as grid distance and movement
+│   └── agents/
+│       ├── survivor_agents.py      # Scout, Defender, Support, and Adaptive agents
+│       ├── zombie_agent.py         # Zombie agent behaviour
+│       └── environment_agents.py   # Obstacles and safe zone
 │
 └── debug/
     └── debug_model.py
