@@ -1,5 +1,9 @@
+import os
 import time
 import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import solara
 
 from src.model import ZombieSurvivalModel
@@ -8,6 +12,36 @@ from src.agents.survivor_agents import ScoutAgent, DefenderAgent, SupportAgent, 
 from src.agents.zombie_agent import ZombieAgent
 from src.agents.environment_agents import ObstacleAgent, SafeZoneAgent
 from config.config import GRID_HEIGHT, GRID_WIDTH, MAX_STEPS, NUM_OBSTACLES, NUM_ZOMBIES, RANDOM_SEED
+
+# ==============================
+# IMAGE ASSETS
+# ===================
+
+ASSETS_DIR = solara.Path(__file__).parent / "images"
+
+IMAGE_PATHS = {
+    "scout": ASSETS_DIR / "scout.png",
+    "defender": ASSETS_DIR / "defender.png",
+    "support": ASSETS_DIR / "support.png",
+    "adaptive": ASSETS_DIR / "adaptive.png",
+    "zombie": ASSETS_DIR / "zombie.png",
+    "obstacle": ASSETS_DIR / "obstacle.png",
+    "safezone": ASSETS_DIR / "safezone.png",
+    "background": ASSETS_DIR / "background.png",
+}
+
+def draw_image(ax, image_path, x, y, zoom=0.12):
+    """
+    Draws an image centered on a grid position.
+    If the image does not exist, it does nothing.
+    """
+    if not image_path.exists():
+        return
+
+    img = mpimg.imread(image_path)
+    image = OffsetImage(img, zoom=zoom)
+    box = AnnotationBbox(image, (x, y), frameon=False)
+    ax.add_artist(box)
 
 # ==============================
 # GLOBAL REACTIVE STATE
@@ -75,6 +109,10 @@ def play_model():
 def pause_model():
     is_playing.value = False
 
+def shutdown_app():
+    is_playing.value = False
+    plt.close("all")
+    os._exit(0)
 
 # ==============================
 # DRAWING FUNCTION
@@ -86,16 +124,26 @@ def draw_grid(model):
     ax.set_xlim(-0.5, model.width - 0.5)
     ax.set_ylim(-0.5, model.height - 0.5)
 
-    ax.set_xticks(range(model.width))
-    ax.set_yticks(range(model.height))
+    background_img = mpimg.imread(IMAGE_PATHS["background"])
 
-    ax.grid(True, linestyle="--", linewidth=0.5)
+    ax.imshow(
+        background_img,
+        aspect="auto",
+        zorder=0
+    )
+
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.grid(False)
+    ax.set_frame_on(True)
+
+    for spine in ax.spines.values():
+        spine.set_visible(True)
+        spine.set_linewidth(2)
+        spine.set_color("black")
 
     ax.set_aspect("equal")
     ax.set_title("Zombie Survival Grid World")
-
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
 
     for agent in list(model.agents):
         if getattr(agent, "pos", None) is None:
@@ -104,24 +152,19 @@ def draw_grid(model):
         x, y = agent.pos
 
         if isinstance(agent, ScoutAgent):
-            ax.scatter(x, y, s=300, marker="o", color="blue")
-            ax.text(x, y, "C", ha="center", va="center", color="white", weight="bold")
+            draw_image(ax, IMAGE_PATHS["scout"], x, y, zoom=0.045)
 
         elif isinstance(agent, DefenderAgent):
-            ax.scatter(x, y, s=300, marker="s", color="blue")
-            ax.text(x, y, "D", ha="center", va="center", color="white", weight="bold")
+            draw_image(ax, IMAGE_PATHS["defender"], x, y, zoom=0.045)
 
         elif isinstance(agent, SupportAgent):
-            ax.scatter(x, y, s=300, marker="D", color="blue")
-            ax.text(x, y, "S", ha="center", va="center", color="white", weight="bold")
+            draw_image(ax, IMAGE_PATHS["support"], x, y, zoom=0.045)
 
         elif isinstance(agent, AdaptiveAgent):
-            ax.scatter(x, y, s=450, marker="*", color="orange")
-            ax.text(x, y, "A", ha="center", va="center", color="black", weight="bold")
+            draw_image(ax, IMAGE_PATHS["adaptive"], x, y, zoom=0.045)
 
         elif isinstance(agent, ZombieAgent):
-            ax.scatter(x, y, s=350, marker="X", color="green")
-            ax.text(x, y, "Z", ha="center", va="center", color="white", weight="bold")
+            draw_image(ax, IMAGE_PATHS["zombie"], x, y, zoom=0.045)
 
         elif isinstance(agent, ObstacleAgent):
             ax.scatter(x, y, s=350, marker="s", color="black")
@@ -175,6 +218,7 @@ def Page():
         solara.Button("Step", on_click=step_model)
         solara.Button("Play", on_click=play_model)
         solara.Button("Pause", on_click=pause_model)
+        solara.Button("Close App", on_click=shutdown_app, color="error")
 
         solara.Markdown("## Information")
         solara.Markdown(f"**Step:** {model.current_step}")
@@ -183,17 +227,6 @@ def Page():
         solara.Markdown(f"**Alive survivors:** {len(model.get_alive_survivors())}")
         solara.Markdown(f"**Alive zombies:** {len(model.get_alive_zombies())}")
         solara.Markdown(f"**Cooperation events:** {model.cooperation_events}")
-
-        solara.Markdown("## Legend")
-        solara.Markdown("""
-- **C**: Scout  
-- **D**: Defender  
-- **S**: Support  
-- **A**: Adaptive Agent  
-- **Z**: Zombie  
-- **Black square**: Obstacle  
-- **S**: Safe Zone  
-""")
 
     solara.Markdown("# Ad Hoc Teamwork in a Zombie Survival Grid World")
 

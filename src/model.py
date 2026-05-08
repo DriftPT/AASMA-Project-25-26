@@ -155,7 +155,7 @@ class ZombieSurvivalModel(Model):
 
         while created < self.num_zombies:
             pos = self.random_empty_position(
-                forbidden_positions=set(self.start_positions + [self.safe_zone_pos])
+                forbidden_positions=set(self.start_positions + self.safe_zone_positions)
             )
 
             zombie = ZombieAgent(self)
@@ -195,6 +195,16 @@ class ZombieSurvivalModel(Model):
             agent for agent in self.agents
             if isinstance(agent, ZombieAgent)
             and agent.alive
+        ]
+
+    def get_active_survivors(self):
+        """
+        Survivors that zombies can still see/target.
+        Survivors inside the safe zone are treated as extracted.
+        """
+        return [
+            survivor for survivor in self.get_alive_survivors()
+            if survivor.pos not in self.safe_zone_positions
         ]
 
     # ==============================
@@ -238,11 +248,14 @@ class ZombieSurvivalModel(Model):
 
         return len(contents) == 0
 
-    def can_move_to(self, pos):
+    def can_move_to(self, pos, moving_agent=None):
         """
-        Agents can move to:
+        Survivors can move to:
         - empty cells;
-        - the safe zone cell.
+        - safe zone cells.
+
+        Zombies can move to:
+        - empty cells only outside the safe zone.
 
         Agents cannot move to:
         - obstacles;
@@ -250,6 +263,10 @@ class ZombieSurvivalModel(Model):
         - living survivors.
         """
         if self.grid.out_of_bounds(pos):
+            return False
+
+        # Zombies cannot enter the safe zone
+        if isinstance(moving_agent, ZombieAgent) and pos in self.safe_zone_positions:
             return False
 
         contents = self.grid.get_cell_list_contents([pos])

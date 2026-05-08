@@ -46,7 +46,7 @@ class SurvivorAgent(Agent):
             self.remove()
 
     def move_to(self, new_pos):
-        if self.model.can_move_to(new_pos):
+        if self.model.can_move_to(new_pos, moving_agent=self):
             self.model.grid.move_agent(self, new_pos)
             self.last_action = Action.MOVE
         else:

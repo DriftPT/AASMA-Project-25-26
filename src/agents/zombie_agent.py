@@ -21,7 +21,7 @@ class ZombieAgent(Agent):
         if not self.alive or self.model.finished:
             return
 
-        survivors = self.model.get_alive_survivors()
+        survivors = self.model.get_active_survivors()
 
         if not survivors:
             return
@@ -39,5 +39,5 @@ class ZombieAgent(Agent):
 
         new_pos = move_towards(self.pos, target.pos)
 
-        if self.model.can_move_to(new_pos):
+        if self.model.can_move_to(new_pos, moving_agent=self):
             self.model.grid.move_agent(self, new_pos)
