@@ -1,4 +1,4 @@
-from src.experiments.experiments import run_all_experiments
+from src.experiments import run_all_experiments
 
 
 def print_results(experiment_name: str, results: dict):
