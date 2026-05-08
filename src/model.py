@@ -7,9 +7,9 @@ from config.config import INITIAL_HEALTH
 from src.agents.environment_agents import ObstacleAgent, SafeZoneAgent
 from src.agents.zombie_agent import ZombieAgent
 from src.agents.survivor_agents import ScoutAgent, DefenderAgent, SupportAgent, AdaptiveAgent
-from src.utils.utils import manhattan_distance
+from src.utils import manhattan_distance
 
-from src.metrics.metrics import (
+from src.metrics import (
     model_success,
     model_alive_survivors,
     model_cooperation_events,

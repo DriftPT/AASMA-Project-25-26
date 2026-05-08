@@ -3,7 +3,7 @@ from typing import Optional, Dict
 
 from mesa import Agent
 
-from src.utils.utils import manhattan_distance, move_towards, move_away_from
+from src.utils import manhattan_distance, move_towards, move_away_from
 
 
 class Action(Enum):

@@ -1,6 +1,6 @@
 from mesa import Agent
 
-from src.utils.utils import manhattan_distance, move_towards
+from src.utils import manhattan_distance, move_towards
 
 
 class ZombieAgent(Agent):

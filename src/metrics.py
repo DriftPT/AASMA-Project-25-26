@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import List, Dict, Any
 
-from src.utils.utils import manhattan_distance
+from src.utils import manhattan_distance
 
 
 @dataclass

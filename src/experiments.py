@@ -10,7 +10,7 @@ from config.config import (
     RANDOM_SEED,
 )
 
-from src.metrics.metrics import collect_episode_result, summarize_results
+from src.metrics import collect_episode_result, summarize_results
 
 
 TEAM_MODES = {
