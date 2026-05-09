@@ -6,6 +6,7 @@ import matplotlib.image as mpimg
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import solara
 
+from pathlib import Path
 from src.model import ZombieSurvivalModel
 
 from src.agents.survivor_agents import ScoutAgent, DefenderAgent, SupportAgent, AdaptiveAgent
@@ -17,7 +18,7 @@ from config.config import GRID_HEIGHT, GRID_WIDTH, MAX_STEPS, NUM_OBSTACLES, NUM
 # IMAGE ASSETS
 # ===================
 
-ASSETS_DIR = solara.Path(__file__).parent / "images"
+ASSETS_DIR = Path(__file__).parent / "images"
 
 IMAGE_PATHS = {
     "scout": ASSETS_DIR / "scout.png",
