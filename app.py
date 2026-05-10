@@ -7,6 +7,7 @@ import solara
 
 from pathlib import Path
 from src.model import ZombieSurvivalModel
+from src.experiments import train_adaptive_agent_for_mode
 
 from src.agents.survivor_agents import ScoutAgent, DefenderAgent, SupportAgent
 from src.agents.adaptive_agent import AdaptiveAgent
@@ -31,15 +32,29 @@ IMAGE_PATHS = {
     "background": ASSETS_DIR / "background.png",
 }
 
-def draw_image(ax, image_path, x, y, zoom=0.12):
+IMAGE_CACHE = {}
+
+def load_image(name):
+    if name not in IMAGE_CACHE:
+        image_path = IMAGE_PATHS[name]
+
+        if not image_path.exists():
+            IMAGE_CACHE[name] = None
+        else:
+            IMAGE_CACHE[name] = mpimg.imread(image_path)
+
+    return IMAGE_CACHE[name]
+
+def draw_image(ax, image_name, x, y, zoom=0.12):
     """
-    Draws an image centered on a grid position.
-    If the image does not exist, it does nothing.
+    Draws a cached image centered on a grid position.
+    The image is loaded only once to avoid memory problems.
     """
-    if not image_path.exists():
+    img = load_image(image_name)
+
+    if img is None:
         return
 
-    img = mpimg.imread(image_path)
     image = OffsetImage(img, zoom=zoom)
     box = AnnotationBbox(image, (x, y), frameon=False)
     ax.add_artist(box)
@@ -54,6 +69,8 @@ refresh_counter = solara.reactive(0)
 
 is_playing = solara.reactive(False)
 
+trained_adaptive_policies = {}
+
 model_state = solara.reactive(
     ZombieSurvivalModel(
         width=GRID_WIDTH,
@@ -63,6 +80,7 @@ model_state = solara.reactive(
         max_steps=MAX_STEPS,
         team_mode="baseline",
         seed=RANDOM_SEED,
+        adaptive_policy=None,
     )
 )
 
@@ -79,8 +97,21 @@ def force_refresh():
     refresh_counter.value += 1
 
 
+def get_adaptive_policy(selected_team_mode):
+    if selected_team_mode == "baseline":
+        return None
+
+    if selected_team_mode not in trained_adaptive_policies:
+        policy = train_adaptive_agent_for_mode(selected_team_mode)
+        trained_adaptive_policies[selected_team_mode] = policy
+
+    return trained_adaptive_policies[selected_team_mode]
+
 def reset_model():
     is_playing.value = False
+
+    adaptive_policy = get_adaptive_policy(team_mode.value)
+
     model_state.value = ZombieSurvivalModel(
         width=GRID_WIDTH,
         height=GRID_HEIGHT,
@@ -89,6 +120,7 @@ def reset_model():
         max_steps=MAX_STEPS,
         team_mode=team_mode.value,
         seed=RANDOM_SEED,
+        adaptive_policy=adaptive_policy,
     )
 
     force_refresh()
@@ -125,7 +157,7 @@ def draw_grid(model):
     ax.set_xlim(-0.5, model.width - 0.5)
     ax.set_ylim(-0.5, model.height - 0.5)
 
-    background_img = mpimg.imread(IMAGE_PATHS["background"])
+    background_img = load_image("background")
 
     ax.imshow(
         background_img,
@@ -153,19 +185,19 @@ def draw_grid(model):
         x, y = agent.pos
 
         if isinstance(agent, ScoutAgent):
-            draw_image(ax, IMAGE_PATHS["scout"], x, y, zoom=0.045)
+            draw_image(ax, "scout", x, y, zoom=0.045)
 
         elif isinstance(agent, DefenderAgent):
-            draw_image(ax, IMAGE_PATHS["defender"], x, y, zoom=0.045)
+            draw_image(ax, "defender", x, y, zoom=0.045)
 
         elif isinstance(agent, SupportAgent):
-            draw_image(ax, IMAGE_PATHS["support"], x, y, zoom=0.045)
+            draw_image(ax, "support", x, y, zoom=0.045)
 
         elif isinstance(agent, AdaptiveAgent):
-            draw_image(ax, IMAGE_PATHS["adaptive"], x, y, zoom=0.045)
+            draw_image(ax, "adaptive", x, y, zoom=0.045)
 
         elif isinstance(agent, ZombieAgent):
-            draw_image(ax, IMAGE_PATHS["zombie"], x, y, zoom=0.045)
+            draw_image(ax, "zombie", x, y, zoom=0.045)
 
         elif isinstance(agent, ObstacleAgent):
             ax.scatter(x, y, s=350, marker="s", color="black")
@@ -211,6 +243,7 @@ def Page():
                 "adaptive_replaces_scout",
                 "adaptive_replaces_defender",
                 "adaptive_replaces_support",
+                "adaptive_adaptive_adaptive",
             ],
             value=team_mode,
         )

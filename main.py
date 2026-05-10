@@ -1,4 +1,4 @@
-from src.experiments import run_all_experiments
+from src.experiments import run_all_experiments_v1
 
 
 def print_results(experiment_name: str, results: dict):
@@ -13,8 +13,7 @@ def print_results(experiment_name: str, results: dict):
 
 
 def main():
-    all_results = run_all_experiments()
-
+    all_results = run_all_experiments_v1() 
     for experiment_name, results in all_results.items():
         print_results(experiment_name, results)
 
