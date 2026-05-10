@@ -8,7 +8,8 @@ import solara
 from pathlib import Path
 from src.model import ZombieSurvivalModel
 
-from src.agents.survivor_agents import ScoutAgent, DefenderAgent, SupportAgent, AdaptiveAgent
+from src.agents.survivor_agents import ScoutAgent, DefenderAgent, SupportAgent
+from src.agents.adaptive_agent import AdaptiveAgent
 from src.agents.zombie_agent import ZombieAgent
 from src.agents.environment_agents import ObstacleAgent, SafeZoneAgent
 from config.config import GRID_HEIGHT, GRID_WIDTH, MAX_STEPS, NUM_OBSTACLES, NUM_ZOMBIES, RANDOM_SEED
