@@ -111,6 +111,8 @@ def run_all_experiments():
         f"Training finished. "
         f"Learned states: {adaptive_policy.number_of_learned_states()}"
     )
+    print()
+    
     adaptive_policy.set_training(False)
     adaptive_policy.set_epsilon(TEST_EPSILON)
 
