@@ -1,4 +1,4 @@
-from model import ZombieSurvivalModel
+from src.model import ZombieSurvivalModel
 
 from config.config import (
     GRID_WIDTH,

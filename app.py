@@ -1,7 +1,6 @@
 import os
 import time
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import solara
@@ -16,7 +15,7 @@ from config.config import GRID_HEIGHT, GRID_WIDTH, MAX_STEPS, NUM_OBSTACLES, NUM
 
 # ==============================
 # IMAGE ASSETS
-# ===================
+# ==============================
 
 ASSETS_DIR = Path(__file__).parent / "images"
 
