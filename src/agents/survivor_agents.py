@@ -566,7 +566,6 @@ class SurvivorAgent(Agent):
 # ==============================
 # Role-specific agents
 # ==============================
-
 class ScoutAgent(SurvivorAgent):
     """Explorer and information-discovery role."""
 
@@ -585,12 +584,34 @@ class ScoutAgent(SurvivorAgent):
         if goal is not None:
             zombie = self.nearby_zombie(max_distance=self.model.scout_escape_range)
 
+            # If a zombie is very close, escape first.
             if zombie is not None:
                 self.explore_target = None
                 self.move_away_towards_team(zombie.pos)
-            else:
-                self.move_towards_position(goal, avoid_zombies=True, allow_wait=False)
+                self.check_safe_zone()
+                return
 
+            # If the safe zone is known but the Scout is leaving the team too far behind,
+            # regroup first, unless the Scout is already very close to the safe zone.
+            if (
+                self.team_is_too_far(self.model.scout_regroup_distance)
+                and manhattan_distance(self.pos, goal) > 2
+            ):
+                self.explore_target = None
+                self.move_towards_position(
+                    self.get_team_center(),
+                    avoid_zombies=True,
+                    allow_wait=False,
+                )
+                self.check_safe_zone()
+                return
+
+            # Otherwise, go to the safe zone.
+            self.move_towards_position(
+                goal,
+                avoid_zombies=True,
+                allow_wait=False,
+            )
             self.check_safe_zone()
             return
 
@@ -605,11 +626,13 @@ class ScoutAgent(SurvivorAgent):
             max_distance=self.model.defender_intercept_range
         )
         if threatened_teammate is not None:
+            self.explore_target = None
             self.move_near_position(threatened_teammate.pos, desired_distance=1, avoid_zombies=True)
             self.check_safe_zone()
             return
 
         if self.team_is_too_far(self.model.scout_regroup_distance):
+            self.explore_target = None
             self.move_towards_position(self.get_team_center(), avoid_zombies=True, allow_wait=False)
             self.check_safe_zone()
             return
