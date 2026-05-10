@@ -23,12 +23,6 @@ class ZombieSurvivalModel(Model):
     """
     Mesa model for the zombie survival grid world.
 
-    The environment contains:
-    - survivor agents;
-    - zombies;
-    - obstacles;
-    - one safe zone.
-
     The safe zone exists from the beginning, but survivors do not know its
     location until it is discovered through vision or Scout scan.
     """
@@ -48,11 +42,9 @@ class ZombieSurvivalModel(Model):
 
         self.width = width
         self.height = height
-
         self.num_zombies = num_zombies
         self.num_obstacles = num_obstacles
         self.max_steps = max_steps
-
         self.team_mode = team_mode
         self.initial_health = INITIAL_HEALTH
 
@@ -77,7 +69,7 @@ class ZombieSurvivalModel(Model):
 
         # Support
         self.support_escape_range = 1
-        self.support_follow_defender_distance = 2
+        self.support_follow_defender_distance = 1
         self.support_follow_scout_distance = 3
         self.support_help_injured_range = 4
 
@@ -87,14 +79,12 @@ class ZombieSurvivalModel(Model):
 
         self.safe_zone_discovered = False
         self.discovered_safe_zone_positions = []
-        self.team_leader_pos = None
 
         self.grid = MultiGrid(width, height, torus=False)
 
         # ==============================
-        # Real safe-zone positions
+        # Safe zone and initial positions
         # ==============================
-        # Used by the environment, but only used by survivors after discovery.
 
         self.safe_zone_positions = [
             (width - 2, height - 2),
@@ -102,12 +92,9 @@ class ZombieSurvivalModel(Model):
             (width - 2, height - 1),
             (width - 1, height - 1),
         ]
-
         self.safe_zone_pos = (width - 1, height - 1)
-
         self.safe_zone_agents = []
 
-        # Reservar posições iniciais da equipa
         self.start_positions = [
             (1, 1),  # Scout
             (0, 1),  # Defender
@@ -116,7 +103,6 @@ class ZombieSurvivalModel(Model):
 
         self.current_step = 0
         self.finished = False
-
         self.cooperation_events = 0
 
         self.create_safe_zone()
@@ -153,38 +139,17 @@ class ZombieSurvivalModel(Model):
 
             obstacle = ObstacleAgent(self)
             self.grid.place_agent(obstacle, pos)
-
             created += 1
 
     def create_survivor_team(self):
         if self.team_mode == "baseline":
-            team = [
-                ScoutAgent(self),
-                DefenderAgent(self),
-                SupportAgent(self),
-            ]
-
+            team = [ScoutAgent(self), DefenderAgent(self), SupportAgent(self)]
         elif self.team_mode == "adaptive_replaces_scout":
-            team = [
-                AdaptiveAgent(self),
-                DefenderAgent(self),
-                SupportAgent(self),
-            ]
-
+            team = [AdaptiveAgent(self), DefenderAgent(self), SupportAgent(self)]
         elif self.team_mode == "adaptive_replaces_defender":
-            team = [
-                ScoutAgent(self),
-                AdaptiveAgent(self),
-                SupportAgent(self),
-            ]
-
+            team = [ScoutAgent(self), AdaptiveAgent(self), SupportAgent(self)]
         elif self.team_mode == "adaptive_replaces_support":
-            team = [
-                ScoutAgent(self),
-                DefenderAgent(self),
-                AdaptiveAgent(self),
-            ]
-
+            team = [ScoutAgent(self), DefenderAgent(self), AdaptiveAgent(self)]
         else:
             raise ValueError(f"Unknown team_mode: {self.team_mode}")
 
@@ -201,7 +166,6 @@ class ZombieSurvivalModel(Model):
 
             zombie = ZombieAgent(self)
             self.grid.place_agent(zombie, pos)
-
             created += 1
 
     def random_empty_position(self, forbidden_positions=None):
@@ -234,15 +198,10 @@ class ZombieSurvivalModel(Model):
     def get_alive_zombies(self):
         return [
             agent for agent in self.agents
-            if isinstance(agent, ZombieAgent)
-            and agent.alive
+            if isinstance(agent, ZombieAgent) and agent.alive
         ]
 
     def get_active_survivors(self):
-        """
-        Survivors that zombies can still see/target.
-        Survivors inside the safe zone are treated as extracted.
-        """
         return [
             survivor for survivor in self.get_alive_survivors()
             if survivor.pos not in self.safe_zone_positions
@@ -258,24 +217,7 @@ class ZombieSurvivalModel(Model):
         if not zombies:
             return None
 
-        return min(
-            zombies,
-            key=lambda zombie: manhattan_distance(pos, zombie.pos)
-        )
-
-    def nearest_survivor(self, pos, exclude=None):
-        survivors = [
-            survivor for survivor in self.get_alive_survivors()
-            if survivor != exclude
-        ]
-
-        if not survivors:
-            return None
-
-        return min(
-            survivors,
-            key=lambda survivor: manhattan_distance(pos, survivor.pos)
-        )
+        return min(zombies, key=lambda zombie: manhattan_distance(pos, zombie.pos))
 
     # ==============================
     # Movement and cell checks
@@ -286,27 +228,12 @@ class ZombieSurvivalModel(Model):
             return False
 
         contents = self.grid.get_cell_list_contents([pos])
-
         return len(contents) == 0
 
     def can_move_to(self, pos, moving_agent=None):
-        """
-        Survivors can move to:
-        - empty cells;
-        - safe zone cells.
-
-        Zombies can move to:
-        - empty cells only outside the safe zone.
-
-        Agents cannot move to:
-        - obstacles;
-        - living zombies;
-        - living survivors.
-        """
         if self.grid.out_of_bounds(pos):
             return False
 
-        # Zombies cannot enter the safe zone.
         if isinstance(moving_agent, ZombieAgent) and pos in self.safe_zone_positions:
             return False
 
@@ -329,10 +256,6 @@ class ZombieSurvivalModel(Model):
     # ==============================
 
     def is_successful(self):
-        """
-        The mission is successful only when all alive survivors
-        have reached one of the safe zone cells.
-        """
         alive_survivors = self.get_alive_survivors()
 
         if len(alive_survivors) == 0:
