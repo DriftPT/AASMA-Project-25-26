@@ -37,7 +37,7 @@ class ZombieAgent(Agent):
             target.take_damage(1)
             return
 
-        new_pos = move_towards(self.pos, target.pos)
+        new_pos = move_towards(self.pos, target.pos, rng=self.model.random)
 
         if self.model.can_move_to(new_pos, moving_agent=self):
             self.model.grid.move_agent(self, new_pos)

@@ -28,6 +28,9 @@ class ZombieSurvivalModel(Model):
     - zombies;
     - obstacles;
     - one safe zone.
+
+    The safe zone exists from the beginning, but survivors do not know its
+    location until it is discovered through vision or Scout scan.
     """
 
     def __init__(
@@ -53,7 +56,45 @@ class ZombieSurvivalModel(Model):
         self.team_mode = team_mode
         self.initial_health = INITIAL_HEALTH
 
+        # ==============================
+        # Agent perception / behaviour ranges
+        # ==============================
+
+        self.vision_range = 5
+
+        self.attack_range = 1
+        self.heal_range = 1
+
+        # Scout
+        self.scout_escape_range = 1
+        self.scout_regroup_distance = 6
+        self.scout_scan_range = 9
+
+        # Defender
+        self.defender_intercept_range = 4
+        self.defender_guard_range = 3
+        self.defender_follow_scout_distance = 2
+
+        # Support
+        self.support_escape_range = 1
+        self.support_follow_defender_distance = 2
+        self.support_follow_scout_distance = 3
+        self.support_help_injured_range = 4
+
+        # ==============================
+        # Shared discovered information
+        # ==============================
+
+        self.safe_zone_discovered = False
+        self.discovered_safe_zone_positions = []
+        self.team_leader_pos = None
+
         self.grid = MultiGrid(width, height, torus=False)
+
+        # ==============================
+        # Real safe-zone positions
+        # ==============================
+        # Used by the environment, but only used by survivors after discovery.
 
         self.safe_zone_positions = [
             (width - 2, height - 2),
@@ -68,9 +109,9 @@ class ZombieSurvivalModel(Model):
 
         # Reservar posições iniciais da equipa
         self.start_positions = [
-            (0, 0),
-            (0, 1),
-            (1, 0),
+            (1, 1),  # Scout
+            (0, 1),  # Defender
+            (1, 0),  # Support
         ]
 
         self.current_step = 0
@@ -265,7 +306,7 @@ class ZombieSurvivalModel(Model):
         if self.grid.out_of_bounds(pos):
             return False
 
-        # Zombies cannot enter the safe zone
+        # Zombies cannot enter the safe zone.
         if isinstance(moving_agent, ZombieAgent) and pos in self.safe_zone_positions:
             return False
 

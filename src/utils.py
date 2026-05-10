@@ -15,7 +15,7 @@ def manhattan_distance(a: Position, b: Position) -> int:
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 
-def move_towards(current: Position, target: Position) -> Position:
+def move_towards(current: Position, target: Position, rng=None) -> Position:
     """
     Returns a position one step closer to the target.
     """
@@ -35,12 +35,12 @@ def move_towards(current: Position, target: Position) -> Position:
         possible_moves.append((x, y - 1))
 
     if possible_moves:
-        return random.choice(possible_moves)
+        return (rng or random).choice(possible_moves)
 
     return current
 
 
-def move_away_from(current: Position, danger: Position) -> Position:
+def move_away_from(current: Position, danger: Position, rng=None) -> Position:
     """
     Returns a position one step away from a dangerous position.
     """
@@ -59,4 +59,4 @@ def move_away_from(current: Position, danger: Position) -> Position:
     else:
         possible_moves.append((x, y + 1))
 
-    return random.choice(possible_moves)
+    return (rng or random).choice(possible_moves)
