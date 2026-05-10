@@ -150,7 +150,7 @@ class ZombieSurvivalModel(Model):
         created = 0
 
         while created < self.num_zombies:
-            pos = self.random_empty_position(forbidden_positions=set())
+            pos = self.random_empty_position(forbidden_positions=set([(0, 0)]))
 
             zombie = ZombieAgent(self)
             self.grid.place_agent(zombie, pos)
