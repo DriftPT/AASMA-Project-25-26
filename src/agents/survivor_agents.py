@@ -1,3 +1,4 @@
+from collections import deque
 from enum import Enum
 from typing import Optional
 
@@ -37,6 +38,7 @@ class SurvivorAgent(Agent):
         self.last_action: Optional[Action] = Action.WAIT
         self.reached_safe_zone = False
         self.visited_positions = set()
+        self.explore_target = None
 
     def step(self):
         raise NotImplementedError
@@ -249,7 +251,13 @@ class SurvivorAgent(Agent):
 
     def get_survivor_by_role(self, role_name: str):
         for survivor in self.model.get_alive_survivors():
+            if survivor == self:
+                continue
+
             if survivor.role_name == role_name:
+                return survivor
+
+            if getattr(survivor, "current_role", None) == role_name:
                 return survivor
 
         return None
@@ -270,56 +278,98 @@ class SurvivorAgent(Agent):
     # Movement helpers
     # ==============================
 
+    def find_next_step_to_target(self, target_pos, desired_distance=0, avoid_zombies=True):
+        """
+        Finds the next step towards a target using BFS pathfinding.
+
+        desired_distance:
+            0 means the agent tries to reach the target cell.
+            1 means the agent tries to get adjacent to the target.
+            2 means the agent tries to stay within distance 2, etc.
+        """
+        if target_pos is None:
+            return None
+
+        if manhattan_distance(self.pos, target_pos) <= desired_distance:
+            return None
+
+        queue = deque()
+        queue.append((self.pos, None))
+
+        visited = {self.pos}
+
+        while queue:
+            current_pos, first_step = queue.popleft()
+
+            for next_pos in grid_neighbours(current_pos):
+                if next_pos in visited:
+                    continue
+
+                if not self.model.can_move_to(next_pos, moving_agent=self):
+                    continue
+
+                if avoid_zombies and self.zombie_risk(next_pos) <= self.model.attack_range:
+                    continue
+
+                visited.add(next_pos)
+
+                if first_step is None:
+                    next_first_step = next_pos
+                else:
+                    next_first_step = first_step
+
+                if manhattan_distance(next_pos, target_pos) <= desired_distance:
+                    return next_first_step
+
+                queue.append((next_pos, next_first_step))
+
+        return None
+
     def move_towards_position(self, target_pos, avoid_zombies=True, allow_wait=True):
+        """
+        Moves toward a target using pathfinding instead of greedy movement.
+
+        If the target cell is occupied, the agent tries to get adjacent to it.
+        This is useful when the target is a zombie or teammate.
+        """
         if target_pos is None:
             self.last_action = Action.WAIT
             return
 
-        candidates = [
-            pos for pos in grid_neighbours(self.pos)
-            if self.model.can_move_to(pos, moving_agent=self)
-        ]
+        # If the target cell is blocked, move adjacent to it instead.
+        if self.model.can_move_to(target_pos, moving_agent=self):
+            desired_distance = 0
+        else:
+            desired_distance = 1
 
-        if allow_wait:
-            candidates.append(self.pos)
+        next_pos = self.find_next_step_to_target(
+            target_pos,
+            desired_distance=desired_distance,
+            avoid_zombies=avoid_zombies,
+        )
 
-        if not candidates:
-            self.last_action = Action.WAIT
-            return
-
-        current_distance = manhattan_distance(self.pos, target_pos)
-        progress_moves = [
-            pos for pos in candidates
-            if manhattan_distance(pos, target_pos) < current_distance
-        ]
-
-        if progress_moves:
-            candidates = progress_moves
-        elif allow_wait:
-            self.last_action = Action.WAIT
-            return
-
-        def score(pos):
-            danger_penalty = 0
-            risk = self.zombie_risk(pos)
-
-            if avoid_zombies and risk <= self.model.attack_range:
-                danger_penalty = 30
-
-            return (
-                danger_penalty,
-                manhattan_distance(pos, target_pos),
-                -risk,
+        # If avoiding zombies gives no path, try again without that restriction.
+        if next_pos is None and avoid_zombies:
+            next_pos = self.find_next_step_to_target(
+                target_pos,
+                desired_distance=desired_distance,
+                avoid_zombies=False,
             )
 
-        best_pos = min(candidates, key=score)
+        if next_pos is None:
+            if allow_wait:
+                self.last_action = Action.WAIT
+            else:
+                self.explore()
+            return
 
-        if best_pos == self.pos:
-            self.last_action = Action.WAIT
-        else:
-            self.move_to(best_pos)
+        self.move_to(next_pos)
 
     def move_near_position(self, target_pos, desired_distance=1, avoid_zombies=True):
+        """
+        Moves near a target using pathfinding.
+        Useful for following teammates without trying to move onto their cell.
+        """
         if target_pos is None:
             self.last_action = Action.WAIT
             return
@@ -328,47 +378,160 @@ class SurvivorAgent(Agent):
             self.last_action = Action.WAIT
             return
 
-        self.move_towards_position(
+        next_pos = self.find_next_step_to_target(
             target_pos,
+            desired_distance=desired_distance,
             avoid_zombies=avoid_zombies,
-            allow_wait=False,
         )
 
+        if next_pos is None and avoid_zombies:
+            next_pos = self.find_next_step_to_target(
+                target_pos,
+                desired_distance=desired_distance,
+                avoid_zombies=False,
+            )
+
+        if next_pos is None:
+            self.explore()
+            return
+
+        self.move_to(next_pos)
+
     def explore(self):
+        """
+        Conservative exploration used by Defender/Support as fallback.
+
+        It avoids immediate danger, prefers unvisited cells, and tries not to
+        separate too much from the team.
+        """
         self.visited_positions.add(self.pos)
 
-        candidates = [
-            pos for pos in grid_neighbours(self.pos)
-            if self.model.can_move_to(pos, moving_agent=self)
-        ]
+        candidates = [pos for pos in grid_neighbours(self.pos) if self.model.can_move_to(pos, moving_agent=self)]
 
         if not candidates:
             self.last_action = Action.WAIT
             return
 
+        # Prefer unvisited neighbouring cells.
         unvisited = [pos for pos in candidates if pos not in self.visited_positions]
+
         if unvisited:
             candidates = unvisited
 
+        # Avoid cells adjacent to zombies if possible.
         safe = [pos for pos in candidates if self.zombie_risk(pos) > self.model.attack_range]
+
         if safe:
             candidates = safe
 
         team_center = self.get_team_center()
-        spawn_reference = self.model.start_positions[0]
 
-        def exploration_score(pos):
+        def score(pos):
             return (
-                manhattan_distance(pos, spawn_reference),
-                manhattan_distance(pos, team_center),
                 self.zombie_risk(pos),
+                -manhattan_distance(pos, team_center),
             )
 
-        best_score = max(exploration_score(pos) for pos in candidates)
-        best_candidates = [pos for pos in candidates if exploration_score(pos) == best_score]
-        chosen_pos = self.model.random.choice(best_candidates)
+        best_score = max(score(pos) for pos in candidates)
 
+        best_candidates = [pos for pos in candidates if score(pos) == best_score]
+
+        chosen_pos = self.model.random.choice(best_candidates)
         self.move_to(chosen_pos)
+
+    def choose_scout_explore_target(self, max_search_distance=10):
+        """
+        Chooses a longer-term exploration target for the Scout.
+
+        The Scout searches for an unvisited reachable cell within a local BFS
+        radius, then chooses one that expands the map while staying reasonably
+        safe.
+        """
+        queue = deque()
+        queue.append((self.pos, 0))
+
+        visited = {self.pos}
+        possible_targets = []
+
+        spawn_reference = self.model.start_positions[0]
+        team_center = self.get_team_center()
+
+        while queue:
+            current_pos, distance = queue.popleft()
+
+            if distance > max_search_distance:
+                continue
+
+            if (
+                current_pos not in self.visited_positions
+                and self.model.can_move_to(current_pos, moving_agent=self)
+                and self.zombie_risk(current_pos) > self.model.attack_range
+            ):
+                possible_targets.append(current_pos)
+
+            for next_pos in grid_neighbours(current_pos):
+                if next_pos in visited:
+                    continue
+
+                if not self.model.can_move_to(next_pos, moving_agent=self):
+                    continue
+
+                visited.add(next_pos)
+                queue.append((next_pos, distance + 1))
+
+        if not possible_targets:
+            return None
+
+        def target_score(pos):
+            return (
+                manhattan_distance(pos, spawn_reference),
+                self.zombie_risk(pos),
+                -manhattan_distance(pos, team_center),
+            )
+
+        return max(possible_targets, key=target_score)
+
+    def scout_explore(self):
+        """
+        Scout-specific exploration.
+
+        Instead of choosing only the best neighbour at each step, the Scout
+        chooses a longer-term exploration target and uses BFS to move toward it.
+        This avoids back-and-forth loops and makes exploration more purposeful.
+        """
+        self.visited_positions.add(self.pos)
+
+        if (
+            self.explore_target is None
+            or self.pos == self.explore_target
+            or not self.model.can_move_to(self.explore_target, moving_agent=self)
+            or self.zombie_risk(self.explore_target) <= self.model.attack_range
+        ):
+            self.explore_target = self.choose_scout_explore_target()
+
+        if self.explore_target is None:
+            self.explore()
+            return
+
+        next_pos = self.find_next_step_to_target(
+            self.explore_target,
+            desired_distance=0,
+            avoid_zombies=True,
+        )
+
+        if next_pos is None:
+            next_pos = self.find_next_step_to_target(
+                self.explore_target,
+                desired_distance=0,
+                avoid_zombies=False,
+            )
+
+        if next_pos is None:
+            self.explore_target = None
+            self.explore()
+            return
+
+        self.move_to(next_pos)
 
     def move_away_towards_team(self, danger_pos):
         candidates = [
@@ -423,6 +586,7 @@ class ScoutAgent(SurvivorAgent):
             zombie = self.nearby_zombie(max_distance=self.model.scout_escape_range)
 
             if zombie is not None:
+                self.explore_target = None
                 self.move_away_towards_team(zombie.pos)
             else:
                 self.move_towards_position(goal, avoid_zombies=True, allow_wait=False)
@@ -432,6 +596,7 @@ class ScoutAgent(SurvivorAgent):
 
         zombie = self.nearby_zombie(max_distance=self.model.scout_escape_range)
         if zombie is not None:
+            self.explore_target = None
             self.move_away_towards_team(zombie.pos)
             self.check_safe_zone()
             return
@@ -449,7 +614,7 @@ class ScoutAgent(SurvivorAgent):
             self.check_safe_zone()
             return
 
-        self.explore()
+        self.scout_explore()
         self.check_safe_zone()
 
 

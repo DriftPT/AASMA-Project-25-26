@@ -54,7 +54,7 @@ class ZombieSurvivalModel(Model):
         # ==============================
         # Agent perception / behaviour ranges
         # ==============================
-
+        self.zombie_vision_range = 6
         self.vision_range = 5
 
         self.attack_range = 1

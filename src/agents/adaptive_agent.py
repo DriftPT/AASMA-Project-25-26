@@ -30,6 +30,9 @@ class AdaptiveAgent(SurvivorAgent):
         # If the model received an external policy, use it.
         # This is used during training/testing so knowledge is preserved
         # between episodes.
+
+        self.current_role = "Adaptive"
+
         if getattr(model, "adaptive_policy", None) is not None:
             self.policy = model.adaptive_policy
         else:
@@ -90,14 +93,17 @@ class AdaptiveAgent(SurvivorAgent):
         ScoutAgent.step(self) does not create a Scout.
         It simply runs the Scout behaviour using the AdaptiveAgent instance.
         """
+        self.current_role = action.capitalize()
 
         if action == "scout":
             ScoutAgent.step(self)
 
         elif action == "defender":
+            self.explore_target = None
             DefenderAgent.step(self)
 
         elif action == "support":
+            self.explore_target = None
             SupportAgent.step(self)
 
     # ==========================================================
