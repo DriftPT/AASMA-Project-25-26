@@ -1,6 +1,5 @@
 from mesa import Model
 from mesa.space import MultiGrid
-from mesa.datacollection import DataCollector
 
 from config.config import INITIAL_HEALTH
 
@@ -151,7 +150,7 @@ class ZombieSurvivalModel(Model):
         created = 0
 
         while created < self.num_zombies:
-            pos = self.random_empty_position(forbidden_positions=set([(0, 0)]))
+            pos = self.random_empty_position(forbidden_positions=set())
 
             zombie = ZombieAgent(self)
             self.grid.place_agent(zombie, pos)

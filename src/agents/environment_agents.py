@@ -14,7 +14,7 @@ class ObstacleAgent(Agent):
 class SafeZoneAgent(Agent):
     """
     Target cell that survivor agents try to reach.
-    The mission succeeds if at least one survivor reaches this cell.
+    The mission succeeds if all survivor agents reach this cells.
     """
 
     def __init__(self, model):
