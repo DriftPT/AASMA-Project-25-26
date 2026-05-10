@@ -38,6 +38,7 @@ class ZombieSurvivalModel(Model):
         max_steps=MAX_STEPS,
         team_mode="baseline",
         seed=RANDOM_SEED,
+        adaptive_policy=None,
     ):
         super().__init__(rng=seed)
 
@@ -47,6 +48,7 @@ class ZombieSurvivalModel(Model):
         self.num_obstacles = num_obstacles
         self.max_steps = max_steps
         self.team_mode = team_mode
+        self.adaptive_policy = adaptive_policy
         self.initial_health = INITIAL_HEALTH
 
         # ==============================
@@ -151,6 +153,8 @@ class ZombieSurvivalModel(Model):
             team = [ScoutAgent(self), AdaptiveAgent(self), SupportAgent(self)]
         elif self.team_mode == "adaptive_replaces_support":
             team = [ScoutAgent(self), DefenderAgent(self), AdaptiveAgent(self)]
+        elif self.team_mode == "adaptive_adaptive_adaptive":
+            team = [AdaptiveAgent(self), AdaptiveAgent(self), AdaptiveAgent(self)]
         else:
             raise ValueError(f"Unknown team_mode: {self.team_mode}")
 
