@@ -150,6 +150,67 @@ def shutdown_app():
 # ==============================
 # DRAWING FUNCTION
 # ==============================
+def draw_health_bar(ax, x, y, health, max_health, color):
+    """
+    Draws a small health bar above an agent.
+
+    x, y:
+        Grid position of the agent.
+
+    health:
+        Current health.
+
+    max_health:
+        Maximum health.
+
+    color:
+        Bar color, for example "green" or "red".
+    """
+    if max_health <= 0:
+        return
+
+    health_ratio = max(0, min(health / max_health, 1))
+
+    bar_width = 0.65
+    bar_height = 0.08
+
+    bar_x = x - bar_width / 2
+    bar_y = y + 0.38
+
+    # Background bar.
+    ax.add_patch(
+        plt.Rectangle(
+            (bar_x, bar_y),
+            bar_width,
+            bar_height,
+            color="black",
+            zorder=10,
+        )
+    )
+
+    # Current health bar.
+    ax.add_patch(
+        plt.Rectangle(
+            (bar_x, bar_y),
+            bar_width * health_ratio,
+            bar_height,
+            color=color,
+            zorder=11,
+        )
+    )
+
+    # Thin border.
+    ax.add_patch(
+        plt.Rectangle(
+            (bar_x, bar_y),
+            bar_width,
+            bar_height,
+            fill=False,
+            edgecolor="white",
+            linewidth=0.6,
+            zorder=12,
+        )
+    )
 
 def draw_grid(model):
     fig, ax = plt.subplots(figsize=(7, 7))
@@ -186,18 +247,23 @@ def draw_grid(model):
 
         if isinstance(agent, ScoutAgent):
             draw_image(ax, "scout", x, y, zoom=0.045)
+            draw_health_bar(ax, x, y, agent.health, agent.max_health, "green")
 
         elif isinstance(agent, DefenderAgent):
             draw_image(ax, "defender", x, y, zoom=0.045)
+            draw_health_bar(ax, x, y, agent.health, agent.max_health, "green")
 
         elif isinstance(agent, SupportAgent):
             draw_image(ax, "support", x, y, zoom=0.045)
+            draw_health_bar(ax, x, y, agent.health, agent.max_health, "green")
 
         elif isinstance(agent, AdaptiveAgent):
             draw_image(ax, "adaptive", x, y, zoom=0.045)
+            draw_health_bar(ax, x, y, agent.health, agent.max_health, "green")
 
         elif isinstance(agent, ZombieAgent):
             draw_image(ax, "zombie", x, y, zoom=0.045)
+            draw_health_bar(ax, x, y, agent.health, agent.max_health, "red")
 
         elif isinstance(agent, ObstacleAgent):
             ax.scatter(x, y, s=350, marker="s", color="black")

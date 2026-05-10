@@ -17,6 +17,7 @@ class ZombieAgent(Agent):
         super().__init__(model)
 
         self.health = 2
+        self.max_health = 2
         self.alive = True
 
         # Used for smarter wandering.

@@ -65,7 +65,7 @@ class ZombieSurvivalModel(Model):
         # Support
         self.support_escape_range = 1
         self.support_follow_defender_distance = 1
-        self.support_follow_scout_distance = 3
+        self.support_follow_scout_distance = 2
         self.support_help_injured_range = 4
 
         # ==============================
@@ -93,7 +93,7 @@ class ZombieSurvivalModel(Model):
         self.start_positions = [
             (1, 1),  # Scout
             (0, 1),  # Defender
-            (1, 0),  # Support
+            (0, 0),  # Support
         ]
 
         self.current_step = 0
@@ -150,7 +150,7 @@ class ZombieSurvivalModel(Model):
         created = 0
 
         while created < self.num_zombies:
-            pos = self.random_empty_position(forbidden_positions=set([(0, 0)]))
+            pos = self.random_empty_position(forbidden_positions=set())
 
             zombie = ZombieAgent(self)
             self.grid.place_agent(zombie, pos)
