@@ -17,7 +17,7 @@ The survivor team can include different agent profiles:
 - **Scout**: focuses on moving safely toward the safe zone.
 - **Defender**: attacks or blocks zombies to protect the team.
 - **Support**: stays close to teammates and heals injured agents.
-- **Adaptive Agent**: observes unknown teammates and adapts its behaviour to complement the team.
+- **Adaptive Agent**: an agent that adapts its behaviour to complement the team.
 
 The adaptive agent does not know the roles of its teammates in advance. It observes their actions and estimates whether they behave more like a Scout, Defender, or Support.
 
@@ -41,12 +41,13 @@ AASMA-Project-25-26/
 │   ├── utils.py                    # Utility functions, such as grid distance and movement
 │   │
 │   └── agents/
-│       ├── survivor_agents.py      # Scout, Defender, Support, and Adaptive agents
+│       ├── survivor_agents.py      # Scout, Defender and Support agents behaviours
+│       ├── adaptive_agent.py       # Adaptive agent behaviour
+│       ├── q_learning_agent.py     # Q-Learning implementation
 │       ├── zombie_agent.py         # Zombie agent behaviour
 │       └── environment_agents.py   # Obstacles and safe zone
 │
-└── debug/
-    └── debug_model.py
+└── debug.py                        # Debugging script
 
 ```
 
@@ -99,6 +100,7 @@ Baseline: Scout + Defender + Support
 Adaptive replaces Scout
 Adaptive replaces Defender
 Adaptive replaces Support
+Team: Adaptive + Adaptive + Adaptive
 ```
 
 ## Running the Visualization
