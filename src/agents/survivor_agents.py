@@ -36,6 +36,8 @@ class SurvivorAgent(Agent):
         self.alive = True
 
         self.last_action: Optional[Action] = Action.WAIT
+        self.scanning = False
+        self.scan_found_safe_zone = False
         self.reached_safe_zone = False
         self.visited_positions = set()
         self.explore_target = None
@@ -153,6 +155,7 @@ class SurvivorAgent(Agent):
         ]
 
         self.last_action = Action.SCAN
+        self.scanning = True
 
         if not self.share_safe_zone_cells(scanned_cells):
             return False
@@ -164,11 +167,15 @@ class SurvivorAgent(Agent):
         if not cells:
             return False
 
+        new_cells = [pos for pos in cells if pos not in self.model.discovered_safe_zone_positions]
+
+        if not new_cells:
+            return False
+
         self.model.safe_zone_discovered = True
 
-        for pos in cells:
-            if pos not in self.model.discovered_safe_zone_positions:
-                self.model.discovered_safe_zone_positions.append(pos)
+        for pos in new_cells:
+            self.model.discovered_safe_zone_positions.append(pos)
 
         return True
 
@@ -576,8 +583,12 @@ class ScoutAgent(SurvivorAgent):
         if not self.alive or self.model.finished or self.stay_if_reached_safe_zone():
             return
 
+        self.scanning = False
         self.discover_safe_zone_if_visible()
-        self.scout_scan()
+        if not self.model.safe_zone_discovered:
+            self.scout_scan()
+        if self.model.safe_zone_discovered:
+            self.scan_found_safe_zone = True
 
         goal = self.get_team_goal()
 
