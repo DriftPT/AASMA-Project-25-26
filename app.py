@@ -7,7 +7,7 @@ import solara
 
 from pathlib import Path
 from src.model import ZombieSurvivalModel
-from src.experiments import train_adaptive_agent_for_mode
+from src.experiments import train_adaptive_agent, train_adaptive_agent_for_mode
 
 from src.agents.survivor_agents import ScoutAgent, DefenderAgent, SupportAgent
 from src.agents.adaptive_agent import AdaptiveAgent
@@ -101,11 +101,16 @@ def get_adaptive_policy(selected_team_mode):
     if selected_team_mode == "baseline":
         return None
 
-    if selected_team_mode not in trained_adaptive_policies:
-        policy = train_adaptive_agent_for_mode(selected_team_mode)
-        trained_adaptive_policies[selected_team_mode] = policy
+    if 'agent' not in trained_adaptive_policies:
+        policy = train_adaptive_agent()
+        trained_adaptive_policies['agent'] = policy
+    #if selected_team_mode not in trained_adaptive_policies:
+    #    policy = train_adaptive_agent_for_mode(selected_team_mode)
+    #    trained_adaptive_policies[selected_team_mode] = policy
+    #
+    #return trained_adaptive_policies[selected_team_mode]
 
-    return trained_adaptive_policies[selected_team_mode]
+    return trained_adaptive_policies['agent']
 
 def reset_model():
     is_playing.value = False
