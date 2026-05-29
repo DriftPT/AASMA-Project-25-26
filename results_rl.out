@@ -1,0 +1,418 @@
+======================================================================
+TRAINING CONFIG: Q-Learning (eps=1.0, decay=0.999)
+======================================================================
+Training finished. Learned states: 268
+
+======================================================================
+TRAINING CONFIG: SARSA (eps=1.0, decay=0.999)
+======================================================================
+Training finished. Learned states: 265
+
+======================================================================
+TRAINING CONFIG: Q-Learning (eps=1.0, decay=0.995)
+======================================================================
+Training finished. Learned states: 262
+
+======================================================================
+TRAINING CONFIG: SARSA (eps=1.0, decay=0.995)
+======================================================================
+Training finished. Learned states: 270
+
+======================================================================
+TRAINING CONFIG: Q-Learning (eps=0.25, no decay)
+======================================================================
+Training finished. Learned states: 259
+
+======================================================================
+TRAINING CONFIG: SARSA (eps=0.25, no decay)
+======================================================================
+Training finished. Learned states: 264
+
+
+######################################################################
+FINAL RESULTS FOR: Q-Learning (eps=1.0, decay=0.999)
+######################################################################
+--------------------------------------------------
+Baseline: Scout + Defender + Support
+--------------------------------------------------
+success_rate: 0.804
+avg_survivors: 2.066
+avg_steps: 99.794
+avg_attack_events: 9.028
+avg_heal_events: 5.646
+avg_scan_events: 0.888
+avg_cooperation_rate: 0.156
+avg_distance: 2.815
+
+--------------------------------------------------
+Adaptive replaces Scout
+--------------------------------------------------
+success_rate: 0.862
+avg_survivors: 2.318
+avg_steps: 93.382
+avg_attack_events: 10.382
+avg_heal_events: 5.928
+avg_scan_events: 0.746
+avg_cooperation_rate: 0.183
+avg_distance: 2.502
+
+--------------------------------------------------
+Adaptive replaces Defender
+--------------------------------------------------
+success_rate: 0.758
+avg_survivors: 1.588
+avg_steps: 86.480
+avg_attack_events: 5.982
+avg_heal_events: 4.044
+avg_scan_events: 0.906
+avg_cooperation_rate: 0.126
+avg_distance: 3.160
+
+--------------------------------------------------
+Adaptive replaces Support
+--------------------------------------------------
+success_rate: 0.840
+avg_survivors: 1.532
+avg_steps: 80.510
+avg_attack_events: 7.182
+avg_heal_events: 1.386
+avg_scan_events: 0.958
+avg_cooperation_rate: 0.118
+avg_distance: 2.748
+
+--------------------------------------------------
+Adaptive (All Roles)
+--------------------------------------------------
+success_rate: 0.894
+avg_survivors: 2.382
+avg_steps: 73.782
+avg_attack_events: 9.500
+avg_heal_events: 4.744
+avg_scan_events: 0.926
+avg_cooperation_rate: 0.206
+avg_distance: 2.997
+
+
+
+######################################################################
+FINAL RESULTS FOR: SARSA (eps=1.0, decay=0.999)
+######################################################################
+--------------------------------------------------
+Baseline: Scout + Defender + Support
+--------------------------------------------------
+success_rate: 0.804
+avg_survivors: 2.066
+avg_steps: 99.794
+avg_attack_events: 9.028
+avg_heal_events: 5.646
+avg_scan_events: 0.888
+avg_cooperation_rate: 0.156
+avg_distance: 2.815
+
+--------------------------------------------------
+Adaptive replaces Scout
+--------------------------------------------------
+success_rate: 0.844
+avg_survivors: 2.396
+avg_steps: 98.956
+avg_attack_events: 10.854
+avg_heal_events: 6.624
+avg_scan_events: 0.798
+avg_cooperation_rate: 0.185
+avg_distance: 2.563
+
+--------------------------------------------------
+Adaptive replaces Defender
+--------------------------------------------------
+success_rate: 0.782
+avg_survivors: 1.628
+avg_steps: 87.080
+avg_attack_events: 6.542
+avg_heal_events: 4.834
+avg_scan_events: 0.916
+avg_cooperation_rate: 0.141
+avg_distance: 3.200
+
+--------------------------------------------------
+Adaptive replaces Support
+--------------------------------------------------
+success_rate: 0.824
+avg_survivors: 1.446
+avg_steps: 88.720
+avg_attack_events: 7.740
+avg_heal_events: 1.728
+avg_scan_events: 0.960
+avg_cooperation_rate: 0.118
+avg_distance: 2.954
+
+--------------------------------------------------
+Adaptive (All Roles)
+--------------------------------------------------
+success_rate: 0.904
+avg_survivors: 2.318
+avg_steps: 78.652
+avg_attack_events: 10.392
+avg_heal_events: 5.266
+avg_scan_events: 0.934
+avg_cooperation_rate: 0.211
+avg_distance: 3.226
+
+
+
+######################################################################
+FINAL RESULTS FOR: Q-Learning (eps=1.0, decay=0.995)
+######################################################################
+--------------------------------------------------
+Baseline: Scout + Defender + Support
+--------------------------------------------------
+success_rate: 0.804
+avg_survivors: 2.066
+avg_steps: 99.794
+avg_attack_events: 9.028
+avg_heal_events: 5.646
+avg_scan_events: 0.888
+avg_cooperation_rate: 0.156
+avg_distance: 2.815
+
+--------------------------------------------------
+Adaptive replaces Scout
+--------------------------------------------------
+success_rate: 0.868
+avg_survivors: 2.432
+avg_steps: 99.736
+avg_attack_events: 11.060
+avg_heal_events: 6.960
+avg_scan_events: 0.832
+avg_cooperation_rate: 0.189
+avg_distance: 2.646
+
+--------------------------------------------------
+Adaptive replaces Defender
+--------------------------------------------------
+success_rate: 0.792
+avg_survivors: 1.784
+avg_steps: 89.274
+avg_attack_events: 6.724
+avg_heal_events: 5.382
+avg_scan_events: 0.926
+avg_cooperation_rate: 0.146
+avg_distance: 3.368
+
+--------------------------------------------------
+Adaptive replaces Support
+--------------------------------------------------
+success_rate: 0.826
+avg_survivors: 1.576
+avg_steps: 89.982
+avg_attack_events: 7.696
+avg_heal_events: 2.150
+avg_scan_events: 0.934
+avg_cooperation_rate: 0.120
+avg_distance: 2.826
+
+--------------------------------------------------
+Adaptive (All Roles)
+--------------------------------------------------
+success_rate: 0.900
+avg_survivors: 2.306
+avg_steps: 74.828
+avg_attack_events: 9.090
+avg_heal_events: 4.934
+avg_scan_events: 0.952
+avg_cooperation_rate: 0.200
+avg_distance: 3.344
+
+
+
+######################################################################
+FINAL RESULTS FOR: SARSA (eps=1.0, decay=0.995)
+######################################################################
+--------------------------------------------------
+Baseline: Scout + Defender + Support
+--------------------------------------------------
+success_rate: 0.804
+avg_survivors: 2.066
+avg_steps: 99.794
+avg_attack_events: 9.028
+avg_heal_events: 5.646
+avg_scan_events: 0.888
+avg_cooperation_rate: 0.156
+avg_distance: 2.815
+
+--------------------------------------------------
+Adaptive replaces Scout
+--------------------------------------------------
+success_rate: 0.878
+avg_survivors: 2.386
+avg_steps: 87.898
+avg_attack_events: 10.460
+avg_heal_events: 6.532
+avg_scan_events: 0.872
+avg_cooperation_rate: 0.203
+avg_distance: 2.634
+
+--------------------------------------------------
+Adaptive replaces Defender
+--------------------------------------------------
+success_rate: 0.812
+avg_survivors: 1.794
+avg_steps: 87.408
+avg_attack_events: 6.526
+avg_heal_events: 5.866
+avg_scan_events: 0.926
+avg_cooperation_rate: 0.152
+avg_distance: 3.334
+
+--------------------------------------------------
+Adaptive replaces Support
+--------------------------------------------------
+success_rate: 0.810
+avg_survivors: 1.672
+avg_steps: 85.680
+avg_attack_events: 7.474
+avg_heal_events: 2.278
+avg_scan_events: 0.928
+avg_cooperation_rate: 0.125
+avg_distance: 2.833
+
+--------------------------------------------------
+Adaptive (All Roles)
+--------------------------------------------------
+success_rate: 0.908
+avg_survivors: 2.398
+avg_steps: 79.552
+avg_attack_events: 9.652
+avg_heal_events: 5.738
+avg_scan_events: 0.962
+avg_cooperation_rate: 0.206
+avg_distance: 3.318
+
+
+
+######################################################################
+FINAL RESULTS FOR: Q-Learning (eps=0.25, no decay)
+######################################################################
+--------------------------------------------------
+Baseline: Scout + Defender + Support
+--------------------------------------------------
+success_rate: 0.804
+avg_survivors: 2.066
+avg_steps: 99.794
+avg_attack_events: 9.028
+avg_heal_events: 5.646
+avg_scan_events: 0.888
+avg_cooperation_rate: 0.156
+avg_distance: 2.815
+
+--------------------------------------------------
+Adaptive replaces Scout
+--------------------------------------------------
+success_rate: 0.840
+avg_survivors: 2.320
+avg_steps: 98.018
+avg_attack_events: 10.586
+avg_heal_events: 6.282
+avg_scan_events: 0.760
+avg_cooperation_rate: 0.180
+avg_distance: 2.418
+
+--------------------------------------------------
+Adaptive replaces Defender
+--------------------------------------------------
+success_rate: 0.760
+avg_survivors: 1.616
+avg_steps: 85.076
+avg_attack_events: 6.036
+avg_heal_events: 4.372
+avg_scan_events: 0.928
+avg_cooperation_rate: 0.133
+avg_distance: 3.074
+
+--------------------------------------------------
+Adaptive replaces Support
+--------------------------------------------------
+success_rate: 0.830
+avg_survivors: 1.454
+avg_steps: 79.748
+avg_attack_events: 6.784
+avg_heal_events: 1.208
+avg_scan_events: 0.956
+avg_cooperation_rate: 0.112
+avg_distance: 2.757
+
+--------------------------------------------------
+Adaptive (All Roles)
+--------------------------------------------------
+success_rate: 0.934
+avg_survivors: 2.392
+avg_steps: 74.414
+avg_attack_events: 9.660
+avg_heal_events: 4.756
+avg_scan_events: 0.950
+avg_cooperation_rate: 0.206
+avg_distance: 2.935
+
+
+
+######################################################################
+FINAL RESULTS FOR: SARSA (eps=0.25, no decay)
+######################################################################
+--------------------------------------------------
+Baseline: Scout + Defender + Support
+--------------------------------------------------
+success_rate: 0.804
+avg_survivors: 2.066
+avg_steps: 99.794
+avg_attack_events: 9.028
+avg_heal_events: 5.646
+avg_scan_events: 0.888
+avg_cooperation_rate: 0.156
+avg_distance: 2.815
+
+--------------------------------------------------
+Adaptive replaces Scout
+--------------------------------------------------
+success_rate: 0.776
+avg_survivors: 2.426
+avg_steps: 141.030
+avg_attack_events: 11.760
+avg_heal_events: 7.568
+avg_scan_events: 0.724
+avg_cooperation_rate: 0.142
+avg_distance: 2.142
+
+--------------------------------------------------
+Adaptive replaces Defender
+--------------------------------------------------
+success_rate: 0.758
+avg_survivors: 1.770
+avg_steps: 94.116
+avg_attack_events: 6.950
+avg_heal_events: 5.306
+avg_scan_events: 0.898
+avg_cooperation_rate: 0.140
+avg_distance: 2.850
+
+--------------------------------------------------
+Adaptive replaces Support
+--------------------------------------------------
+success_rate: 0.832
+avg_survivors: 1.708
+avg_steps: 81.540
+avg_attack_events: 7.616
+avg_heal_events: 2.104
+avg_scan_events: 0.938
+avg_cooperation_rate: 0.131
+avg_distance: 2.796
+
+--------------------------------------------------
+Adaptive (All Roles)
+--------------------------------------------------
+success_rate: 0.838
+avg_survivors: 2.218
+avg_steps: 119.818
+avg_attack_events: 11.272
+avg_heal_events: 5.654
+avg_scan_events: 0.886
+avg_cooperation_rate: 0.149
+avg_distance: 3.459

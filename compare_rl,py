@@ -65,57 +65,60 @@ def train_custom_agent(config: dict, train_episodes: int = TRAIN_EPISODES):
 # ==============================
 # EXECUÇÃO E IMPRESSÃO
 # ==============================
-def print_results(experiment_name: str, results: dict):
-    print("-" * 50)
-    print(experiment_name)
-    print("-" * 50)
+def print_results(experiment_name: str, results: dict, output_file=None):
+    print("-" * 50, file=output_file)
+    print(experiment_name, file=output_file)
+    print("-" * 50, file=output_file)
 
     for metric_name, value in results.items():
-        print(f"{metric_name}: {value:.3f}")
+        print(f"{metric_name}: {value:.3f}", file=output_file)
     print()
 
 
-def run_comparisons():
+def run_comparisons(output_filename="results_rl.out"):
     master_results = {}
 
-    for config in RL_CONFIGS:
-        config_name = config["name"]
-        
-        print("\n" + "=" * 70)
-        print(f"TRAINING CONFIG: {config_name}")
-        print("=" * 70)
+    with open(output_filename, 'w', encoding='utf-8') as f:
+        for config in RL_CONFIGS:
+            config_name = config["name"]
+            
+            print("\n" + "=" * 70, file=f)
+            print(f"TRAINING CONFIG: {config_name}", file=f)
+            print("=" * 70, file=f)
 
-        # Treina com a configuração atual
-        adaptive_policy = train_custom_agent(config)
+            # Treina com a configuração atual
+            adaptive_policy = train_custom_agent(config)
 
-        print(
-            f"Training finished. "
-            f"Learned states: {adaptive_policy.number_of_learned_states()}"
-        )
-        
-        adaptive_policy.set_training(False)
-        adaptive_policy.set_epsilon(TEST_EPSILON)
+            print(
+                f"Training finished. "
+                f"Learned states: {adaptive_policy.number_of_learned_states()}",
+                file=f
+            )
+            
+            adaptive_policy.set_training(False)
+            adaptive_policy.set_epsilon(TEST_EPSILON)
 
-        config_results = {}
+            config_results = {}
 
-        # Corre os testes para esta configuração
-        for experiment_name, team_mode in TEAM_MODES.items():
-            if team_mode == "baseline":
-                config_results[experiment_name] = run_experiment(team_mode, adaptive_policy=None)
-            else:
-                config_results[experiment_name] = run_experiment(team_mode, adaptive_policy=adaptive_policy)
+            # Corre os testes para esta configuração
+            for experiment_name, team_mode in TEAM_MODES.items():
+                if team_mode == "baseline":
+                    config_results[experiment_name] = run_experiment(team_mode, adaptive_policy=None)
+                else:
+                    config_results[experiment_name] = run_experiment(team_mode, adaptive_policy=adaptive_policy)
 
-        master_results[config_name] = config_results
+            master_results[config_name] = config_results
 
-    # Imprime todos os resultados no final de forma agrupada
-    for config_name, all_results in master_results.items():
-        print(f"\n\n{'#' * 70}")
-        print(f"FINAL RESULTS FOR: {config_name}")
-        print(f"{'#' * 70}")
-        
-        for experiment_name, results in all_results.items():
-            print_results(experiment_name, results)
+        # Imprime todos os resultados no final de forma agrupada
+        for config_name, all_results in master_results.items():
+            print(f"\n\n{'#' * 70}", file=f)
+            print(f"FINAL RESULTS FOR: {config_name}", file=f)
+            print(f"{'#' * 70}", file=f)
+            
+            for experiment_name, results in all_results.items():
+                print_results(experiment_name, results, output_file=f)
 
+    print(f"\nProcesso concluído! Podes ver os resultados no ficheiro: {output_filename}")
 
 if __name__ == "__main__":
     run_comparisons()
