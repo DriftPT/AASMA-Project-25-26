@@ -104,7 +104,6 @@ class ZombieSurvivalModel(Model):
         self.attack_events = 0
         self.heal_events = 0
         self.scan_events = 0
-        self.sum_avg_distance = 0
         self.count_avg = 0
 
         self.create_safe_zones()
@@ -273,25 +272,6 @@ class ZombieSurvivalModel(Model):
             if survivor.pos not in self.safe_zone_positions
         ]
 
-    def compute_avg_survivor_distance(self):
-        """Compute average pairwise Manhattan distance among alive survivors.
-
-        Returns the average distance (float) or None if fewer than 2 survivors.
-        """
-        alive_survivors = self.get_alive_survivors()
-        if len(alive_survivors) < 2:
-            return None
-
-        distances = []
-        for i in range(len(alive_survivors)):
-            for j in range(i + 1, len(alive_survivors)):
-                distances.append(manhattan_distance(alive_survivors[i].pos, alive_survivors[j].pos))
-        
-
-        self.avg_distance = sum(distances) / len(distances)
-        self.sum_avg_distance += self.avg_distance
-        self.count_avg += 1
-
     # ==============================
     # Search helpers
     # ==============================
@@ -392,6 +372,5 @@ class ZombieSurvivalModel(Model):
 
         for zombie in zombies:
             zombie.step()
-
-        self.compute_avg_survivor_distance()
+            
         self.update_finished_status()
