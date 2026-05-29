@@ -1,5 +1,5 @@
 from src.model import ZombieSurvivalModel
-from src.agents.q_learning_policy import QLearningPolicy
+from src.agents.rl_policy import RLPolicy
 
 from config.config import (
     GRID_WIDTH,
@@ -7,7 +7,6 @@ from config.config import (
     NUM_ZOMBIES,
     NUM_OBSTACLES,
     MAX_STEPS,
-    EPISODES,
     RANDOM_SEED,
 )
 
@@ -15,12 +14,16 @@ from src.metrics import collect_episode_result, summarize_results
 
 
 # ==============================
-# Q-LEARNING CONFIGURATION
+# RL CONFIGURATION
 # ==============================
 
-TRAIN_EPISODES = 300
-TRAIN_EPSILON = 0.25
+ALGORITHM = "sarsa" #ou q_learning
+TRAIN_EPISODES = 1500
+TEST_EPISODES = 500
+TRAIN_EPSILON = 1
+EPSILON_DECAY = 0.999
 TEST_EPSILON = 0.0
+
 
 ADAPTIVE_ACTIONS = ("scout", "defender", "support")
 
@@ -62,11 +65,13 @@ def run_episode(team_mode: str, seed: int, adaptive_policy=None):
 # ==============================
 
 def train_adaptive_agent(train_episodes: int = TRAIN_EPISODES):
-    policy = QLearningPolicy(
+    policy = RLPolicy(
         actions=ADAPTIVE_ACTIONS,
+        algorithm=ALGORITHM,
         alpha=0.2,
         gamma=0.9,
         epsilon=TRAIN_EPSILON,
+        epsilon_decay=EPSILON_DECAY,
         training=True,
     )
 
@@ -77,13 +82,14 @@ def train_adaptive_agent(train_episodes: int = TRAIN_EPISODES):
 
         run_episode(
             team_mode=team_mode,
-            seed=RANDOM_SEED + EPISODES + episode,
+            seed=RANDOM_SEED + TEST_EPISODES + episode,
             adaptive_policy=policy,
         )
 
+        policy.decay_epsilon()
     return policy
 
-def run_experiment(team_mode: str, episodes: int = EPISODES, adaptive_policy=None,):
+def run_experiment(team_mode: str, episodes: int = TEST_EPISODES, adaptive_policy=None,):
     results = []
 
     for i in range(episodes):

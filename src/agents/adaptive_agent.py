@@ -4,41 +4,26 @@ from src.agents.survivor_agents import (
     DefenderAgent,
     SupportAgent,
 )
-from src.agents.q_learning_policy import QLearningPolicy
+from src.agents.rl_policy import RLPolicy
 from src.utils import manhattan_distance
 
 
 class AdaptiveAgent(SurvivorAgent):
-    """
-    Adaptive ad hoc agent using Q-learning.
-
-    The Q-learning actions are high-level role behaviours:
-
-    - "scout": reuse ScoutAgent.step(self)
-    - "defender": reuse DefenderAgent.step(self)
-    - "support": reuse SupportAgent.step(self)
-
-    So the agent does not learn primitive actions directly.
-    It learns which existing role policy should be used in each state.
-    """
 
     ACTIONS = ("scout", "defender", "support")
 
     def __init__(self, model):
         super().__init__(model, role_name="Adaptive", symbol="A")
 
-        # If the model received an external policy, use it.
-        # This is used during training/testing so knowledge is preserved
-        # between episodes.
-
         self.current_role = "Adaptive"
+        self.next_action = None  # New property to support the on-policy flow (SARSA)
 
         if getattr(model, "adaptive_policy", None) is not None:
             self.policy = model.adaptive_policy
         else:
-            # Fallback for visualisation / single runs — starts with empty Q-table.
-            self.policy = QLearningPolicy(
+            self.policy = RLPolicy(
                 actions=self.ACTIONS,
+                algorithm="q_learning",  # Default
                 epsilon=0.0,
                 training=False,
             )
@@ -49,10 +34,15 @@ class AdaptiveAgent(SurvivorAgent):
 
         state_before = self.get_state()
 
-        action = self.policy.choose_action(
-            state=state_before,
-            rng=self.model.random,
-        )
+        # If using SARSA and the action was already chosen at the end of the previous step, reuse it
+        if self.next_action is not None:
+            action = self.next_action
+            self.next_action = None 
+        else:
+            action = self.policy.choose_action(
+                state=state_before,
+                rng=self.model.random,
+            )
 
         old_health = self.health
         old_distance_to_safe = self.distance_to_nearest_safe_zone()
@@ -77,13 +67,17 @@ class AdaptiveAgent(SurvivorAgent):
         )
 
         state_after = self.get_state()
+        # Choose the next action A_t+1 (required to compute the SARSA update now)
+        chosen_next_action = self.policy.choose_action(state=state_after, rng=self.model.random)
 
         self.policy.update(
             state=state_before,
             action=action,
             reward=reward,
             next_state=state_after,
+            next_action=chosen_next_action,
         )
+        self.next_action = chosen_next_action
 
     # ==========================================================
     # Reuse existing survivor behaviours

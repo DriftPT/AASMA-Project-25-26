@@ -1,0 +1,121 @@
+from config.config import RANDOM_SEED
+from src.agents.rl_policy import RLPolicy
+from src.experiments import (
+    TEAM_MODES,
+    ADAPTIVE_ACTIONS,
+    TRAIN_EPISODES,
+    TEST_EPISODES,
+    TEST_EPSILON,
+    run_episode,
+    run_experiment
+)
+
+# ==============================
+# CONFIGURAÇÕES DE TESTE
+# ==============================
+
+RL_CONFIGS = [
+    {"name": "Q-Learning (eps=1.0, decay=0.999)", "algorithm": "q_learning", "epsilon": 1.0, "decay": 0.999},
+    {"name": "SARSA (eps=1.0, decay=0.999)",      "algorithm": "sarsa",      "epsilon": 1.0, "decay": 0.999},
+    {"name": "Q-Learning (eps=1.0, decay=0.995)", "algorithm": "q_learning", "epsilon": 1.0, "decay": 0.995},
+    {"name": "SARSA (eps=1.0, decay=0.995)",      "algorithm": "sarsa",      "epsilon": 1.0, "decay": 0.995},
+    {"name": "Q-Learning (eps=0.25, no decay)",   "algorithm": "q_learning", "epsilon": 0.25, "decay": 1.0},
+    {"name": "SARSA (eps=0.25, no decay)",        "algorithm": "sarsa",      "epsilon": 0.25, "decay": 1.0},
+]
+
+# ==============================
+# TREINO PERSONALIZADO
+# ==============================
+def train_custom_agent(config: dict, train_episodes: int = TRAIN_EPISODES):
+    """
+    Treina o agente com base nas definições passadas no dicionário de configuração.
+    """
+    policy = RLPolicy(
+        actions=ADAPTIVE_ACTIONS,
+        algorithm=config["algorithm"],
+        alpha=0.2,
+        gamma=0.9,
+        epsilon=config["epsilon"],
+        epsilon_decay=config["decay"],
+        training=True,
+    )
+
+    training_modes = [
+        "adaptive_replaces_scout",
+        "adaptive_replaces_defender",
+        "adaptive_replaces_support",
+        "adaptive_adaptive_adaptive"
+    ]
+
+    for episode in range(train_episodes):
+        team_mode = training_modes[episode % len(training_modes)]
+
+        # Importamos o run_episode do teu experiments.py original
+        run_episode(
+            team_mode=team_mode,
+            seed=RANDOM_SEED + TEST_EPISODES + episode,
+            adaptive_policy=policy,
+        )
+
+        # Aplica o decay após cada episódio
+        policy.decay_epsilon()
+        
+    return policy
+
+# ==============================
+# EXECUÇÃO E IMPRESSÃO
+# ==============================
+def print_results(experiment_name: str, results: dict):
+    print("-" * 50)
+    print(experiment_name)
+    print("-" * 50)
+
+    for metric_name, value in results.items():
+        print(f"{metric_name}: {value:.3f}")
+    print()
+
+
+def run_comparisons():
+    master_results = {}
+
+    for config in RL_CONFIGS:
+        config_name = config["name"]
+        
+        print("\n" + "=" * 70)
+        print(f"TRAINING CONFIG: {config_name}")
+        print("=" * 70)
+
+        # Treina com a configuração atual
+        adaptive_policy = train_custom_agent(config)
+
+        print(
+            f"Training finished. "
+            f"Learned states: {adaptive_policy.number_of_learned_states()}"
+        )
+        
+        adaptive_policy.set_training(False)
+        adaptive_policy.set_epsilon(TEST_EPSILON)
+
+        config_results = {}
+
+        # Corre os testes para esta configuração
+        for experiment_name, team_mode in TEAM_MODES.items():
+            if team_mode == "baseline":
+                config_results[experiment_name] = run_experiment(team_mode, adaptive_policy=None)
+            else:
+                config_results[experiment_name] = run_experiment(team_mode, adaptive_policy=adaptive_policy)
+
+        master_results[config_name] = config_results
+
+    # Imprime todos os resultados no final de forma agrupada
+    for config_name, all_results in master_results.items():
+        print(f"\n\n{'#' * 70}")
+        print(f"FINAL RESULTS FOR: {config_name}")
+        print(f"{'#' * 70}")
+        
+        for experiment_name, results in all_results.items():
+            print_results(experiment_name, results)
+
+
+if __name__ == "__main__":
+    run_comparisons()
