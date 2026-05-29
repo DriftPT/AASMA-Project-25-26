@@ -98,54 +98,7 @@ def run_experiment(team_mode: str, episodes: int = EPISODES, adaptive_policy=Non
     return summarize_results(results)
 
 
-def train_adaptive_agent_for_mode(team_mode: str, train_episodes: int = TRAIN_EPISODES):
-    policy = QLearningPolicy(
-        actions=ADAPTIVE_ACTIONS,
-        alpha=0.2,
-        gamma=0.9,
-        epsilon=TRAIN_EPSILON,
-        training=True,
-    )
-
-    for episode in range(train_episodes):
-        run_episode(
-            team_mode=team_mode,
-            seed=RANDOM_SEED + EPISODES + episode,
-            adaptive_policy=policy,
-        )
-
-    policy.set_training(False)
-    policy.set_epsilon(TEST_EPSILON)
-
-    return policy
-
-def run_all_experiments_v1():
-    all_results = {}
-    print("=" * 70)
-    print("Training Adaptive Agent for the modes")
-    print("=" * 70)
-    print()
-
-    for experiment_name, team_mode in TEAM_MODES.items():
-        if team_mode == "baseline":
-            all_results[experiment_name] = run_experiment(team_mode,adaptive_policy=None)
-        else:
-            print(f"Training adaptive agent for mode: {team_mode}")
-
-            adaptive_policy = train_adaptive_agent_for_mode(team_mode)
-
-            print(
-                f"Training finished. "
-                f"Learned states: {adaptive_policy.number_of_learned_states()}"
-            )
-
-            all_results[experiment_name] = run_experiment(team_mode,adaptive_policy=adaptive_policy)
-
-        print()
-
-    return all_results
-
-def run_all_experiments_v2():
+def run_all_experiments():
     all_results = {}
 
     print("=" * 70)

@@ -36,9 +36,7 @@ class AdaptiveAgent(SurvivorAgent):
         if getattr(model, "adaptive_policy", None) is not None:
             self.policy = model.adaptive_policy
         else:
-            # Useful for visualization or single runs.
-            # If no policy is provided, the adaptive still works,
-            # but it starts with an empty Q-table.
+            # Fallback for visualisation / single runs — starts with empty Q-table.
             self.policy = QLearningPolicy(
                 actions=self.ACTIONS,
                 epsilon=0.0,
@@ -57,9 +55,10 @@ class AdaptiveAgent(SurvivorAgent):
         )
 
         old_health = self.health
-        old_distance_to_safe = self.distance_to_safe_zone()
+        old_distance_to_safe = self.distance_to_nearest_safe_zone()
         old_cooperation_events = self.model.cooperation_events
         old_safe_discovered = self.model.safe_zone_discovered
+        old_teammate_count = len([s for s in self.model.get_alive_survivors() if s is not self])
 
         self.perform_learned_action(action)
 
@@ -70,6 +69,7 @@ class AdaptiveAgent(SurvivorAgent):
             old_distance_to_safe=old_distance_to_safe,
             old_cooperation_events=old_cooperation_events,
             old_safe_discovered=old_safe_discovered,
+            old_teammate_count=old_teammate_count,
         )
 
         state_after = self.get_state()
@@ -137,12 +137,12 @@ class AdaptiveAgent(SurvivorAgent):
         return "high"
 
     def safe_distance_bucket(self):
-        distance = self.distance_to_safe_zone()
+        distance = self.distance_to_nearest_safe_zone()
 
-        if distance <= 3:
+        if distance <= 4:
             return "near"
 
-        if distance <= 8:
+        if distance <= 10:
             return "medium"
 
         return "far"
@@ -158,12 +158,28 @@ class AdaptiveAgent(SurvivorAgent):
         if distance <= 1:
             return "danger"
 
-        if distance <= 4:
+        if distance <= 5:
             return "near"
 
         return "far"
 
-    def distance_to_safe_zone(self):
+    def nearby_zombie_count_bucket(self):
+        """How many zombies are within vision range"""
+        count = sum(
+            1 for z in self.model.get_alive_zombies()
+            if manhattan_distance(self.pos, z.pos) <= self.model.vision_range
+        )
+        if count == 0:
+            return "none"
+        if count <= 2:
+            return "few"
+        return "many"
+
+    def distance_to_nearest_safe_zone(self):
+        """Distance to the closest safe zone cell (known or unknown)."""
+        if not self.model.safe_zone_positions:
+            return self.model.width + self.model.height
+ 
         return min(
             manhattan_distance(self.pos, safe_pos)
             for safe_pos in self.model.safe_zone_positions
@@ -180,6 +196,7 @@ class AdaptiveAgent(SurvivorAgent):
         old_distance_to_safe,
         old_cooperation_events,
         old_safe_discovered,
+        old_teammate_count,
     ):
         """
         Reward used by Q-learning.
@@ -200,7 +217,7 @@ class AdaptiveAgent(SurvivorAgent):
 
         reward = -0.1
 
-        new_distance_to_safe = self.distance_to_safe_zone()
+        new_distance_to_safe = self.distance_to_nearest_safe_zone()
 
         if new_distance_to_safe < old_distance_to_safe:
             reward += 1.0
@@ -219,10 +236,14 @@ class AdaptiveAgent(SurvivorAgent):
         if self.pos in self.model.safe_zone_positions:
             reward += 5.0
 
+        new_teammate_count = len([s for s in self.model.get_alive_survivors() if s is not self])
+        if new_teammate_count < old_teammate_count:
+            reward -= 8.0
+
         if self.model.is_successful():
             reward += 20.0
 
         if not self.alive:
             reward -= 20.0
-
+        
         return reward

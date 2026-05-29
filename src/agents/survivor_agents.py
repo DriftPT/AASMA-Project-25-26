@@ -109,10 +109,17 @@ class SurvivorAgent(Agent):
             self.reached_safe_zone = True
 
     def move_deeper_into_safe_zone(self):
+        """Move toward the deepest cell of the nearest safe zone cluster."""
         if self.pos not in self.model.safe_zone_positions:
             return
 
-        current_distance = manhattan_distance(self.pos, self.model.safe_zone_pos)
+        # Find the cluster centre closest to current position
+        nearest_center = closest_position(self.pos, self.model.safe_zone_centers)
+        if nearest_center is None:
+            self.last_action = Action.WAIT
+            return
+        
+        current_distance = manhattan_distance(self.pos, nearest_center)
 
         candidates = [
             pos for pos in grid_neighbours(self.pos)
@@ -122,14 +129,13 @@ class SurvivorAgent(Agent):
 
         deeper_candidates = [
             pos for pos in candidates
-            if manhattan_distance(pos, self.model.safe_zone_pos) < current_distance
+            if manhattan_distance(pos, nearest_center) < current_distance
         ]
 
         if not deeper_candidates:
             self.last_action = Action.WAIT
             return
-
-        best_pos = closest_position(self.model.safe_zone_pos, deeper_candidates)
+        best_pos = closest_position(nearest_center, deeper_candidates)
         self.move_to(best_pos)
 
     def stay_if_reached_safe_zone(self) -> bool:
@@ -180,6 +186,11 @@ class SurvivorAgent(Agent):
         return True
 
     def get_team_goal(self):
+        """
+        Returns the closest discovered safe zone cell to this agent.
+        With multiple safe zones spread across the map, each agent naturally
+        heads toward the nearest one rather than all converging on the same spot.
+        """
         if not self.model.safe_zone_discovered:
             return None
 

@@ -7,7 +7,7 @@ import solara
 
 from pathlib import Path
 from src.model import ZombieSurvivalModel
-from src.experiments import train_adaptive_agent, train_adaptive_agent_for_mode
+from src.experiments import train_adaptive_agent
 
 from src.agents.survivor_agents import ScoutAgent, DefenderAgent, SupportAgent
 from src.agents.adaptive_agent import AdaptiveAgent
@@ -60,6 +60,43 @@ def draw_image(ax, image_name, x, y, zoom=0.12):
     ax.add_artist(box)
 
 # ==============================
+# PROPORTIONAL SIZING HELPERS
+# ==============================
+ 
+# Reference grid for which the original zoom/sizes were tuned.
+_REF_GRID = 20
+ 
+def _scale(grid_size: int) -> float:
+    """Linear scale factor relative to the reference 20x20 grid."""
+    return _REF_GRID / grid_size
+ 
+def image_zoom(grid_size: int) -> float:
+    """Zoom for OffsetImage — shrinks proportionally as the grid grows."""
+    return 0.045 * _scale(grid_size)
+ 
+def scatter_size(grid_size: int, base: float) -> float:
+    """Marker size for ax.scatter — area scales as scale^2."""
+    return base * (_scale(grid_size) ** 2)
+ 
+def health_bar_dims(grid_size: int):
+    """Returns (bar_width, bar_height, y_offset) scaled to the grid."""
+    s = _scale(grid_size)
+    return 0.65 * s, 0.08 * s, 0.38 * s
+ 
+def font_size(grid_size: int, base: float = 8.0) -> float:
+    """Font size for text labels on the grid."""
+    return max(4.0, base * _scale(grid_size))
+ 
+ 
+def draw_image(ax, image_name, x, y, zoom=0.045):
+    img = load_image(image_name)
+    if img is None:
+        return
+    image = OffsetImage(img, zoom=zoom)
+    box = AnnotationBbox(image, (x, y), frameon=False)
+    ax.add_artist(box)
+
+# ==============================
 # GLOBAL REACTIVE STATE
 # ==============================
 
@@ -69,7 +106,7 @@ refresh_counter = solara.reactive(0)
 
 is_playing = solara.reactive(False)
 
-trained_adaptive_policies = {}
+trained_adaptive_policies = None
 
 model_state = solara.reactive(
     ZombieSurvivalModel(
@@ -98,19 +135,15 @@ def force_refresh():
 
 
 def get_adaptive_policy(selected_team_mode):
+    global trained_adaptive_policies
+    
     if selected_team_mode == "baseline":
         return None
 
-    if 'agent' not in trained_adaptive_policies:
-        policy = train_adaptive_agent()
-        trained_adaptive_policies['agent'] = policy
-    #if selected_team_mode not in trained_adaptive_policies:
-    #    policy = train_adaptive_agent_for_mode(selected_team_mode)
-    #    trained_adaptive_policies[selected_team_mode] = policy
-    #
-    #return trained_adaptive_policies[selected_team_mode]
+    if trained_adaptive_policies is None:
+        trained_adaptive_policies = train_adaptive_agent()
 
-    return trained_adaptive_policies['agent']
+    return trained_adaptive_policies
 
 def reset_model():
     is_playing.value = False
@@ -218,7 +251,8 @@ def draw_health_bar(ax, x, y, health, max_health, color):
     )
 
 def draw_grid(model):
-    fig, ax = plt.subplots(figsize=(7, 7))
+    fig, ax = plt.subplots(figsize=(8, 8))
+    fig.subplots_adjust(left=0, right=1, top=0.97, bottom=0.01)
 
     ax.set_xlim(-0.5, model.width - 0.5)
     ax.set_ylim(-0.5, model.height - 0.5)
@@ -243,6 +277,13 @@ def draw_grid(model):
 
     ax.set_aspect("equal")
     ax.set_title("Zombie Survival Grid World")
+    
+    # Pre-compute sizes once per frame
+    grid_size = max(model.width, model.height)
+    zoom      = image_zoom(grid_size)
+    obs_size  = scatter_size(grid_size, base=350)
+    safe_size = scatter_size(grid_size, base=500)
+    lbl_fs    = font_size(grid_size, base=9.0)
 
     for agent in list(model.agents):
         if getattr(agent, "pos", None) is None:
@@ -251,31 +292,31 @@ def draw_grid(model):
         x, y = agent.pos
 
         if isinstance(agent, ScoutAgent):
-            draw_image(ax, "scout", x, y, zoom=0.045)
+            draw_image(ax, "scout", x, y, zoom=zoom)
             draw_health_bar(ax, x, y, agent.health, agent.max_health, "green")
 
         elif isinstance(agent, DefenderAgent):
-            draw_image(ax, "defender", x, y, zoom=0.045)
+            draw_image(ax, "defender", x, y, zoom=zoom)
             draw_health_bar(ax, x, y, agent.health, agent.max_health, "green")
 
         elif isinstance(agent, SupportAgent):
-            draw_image(ax, "support", x, y, zoom=0.045)
+            draw_image(ax, "support", x, y, zoom=zoom)
             draw_health_bar(ax, x, y, agent.health, agent.max_health, "green")
 
         elif isinstance(agent, AdaptiveAgent):
-            draw_image(ax, "adaptive", x, y, zoom=0.045)
+            draw_image(ax, "adaptive", x, y, zoom=zoom)
             draw_health_bar(ax, x, y, agent.health, agent.max_health, "green")
 
         elif isinstance(agent, ZombieAgent):
-            draw_image(ax, "zombie", x, y, zoom=0.045)
+            draw_image(ax, "zombie", x, y, zoom=zoom)
             draw_health_bar(ax, x, y, agent.health, agent.max_health, "red")
 
         elif isinstance(agent, ObstacleAgent):
-            ax.scatter(x, y, s=350, marker="s", color="black")
+            ax.scatter(x, y, s=obs_size, marker="s", color="black")
 
         elif isinstance(agent, SafeZoneAgent):
-            ax.scatter(x, y, s=500, marker="P", color="gold")
-            ax.text(x, y, "S", ha="center", va="center", color="black", weight="bold")
+            ax.scatter(x, y, s=safe_size, marker="P", color="gold")
+            ax.text(x, y, "S", ha="center", va="center", color="black", weight="bold", fontsize=lbl_fs)
 
     return fig
 

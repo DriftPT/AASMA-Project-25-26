@@ -1,23 +1,22 @@
 from mesa import Model
 from mesa.space import MultiGrid
 
-from config.config import INITIAL_HEALTH
-
 from src.agents.environment_agents import ObstacleAgent, SafeZoneAgent
 from src.agents.zombie_agent import ZombieAgent
 from src.agents.survivor_agents import ScoutAgent, DefenderAgent, SupportAgent
 from src.agents.adaptive_agent import AdaptiveAgent
 from src.utils import manhattan_distance
 
-from config.config import GRID_WIDTH, GRID_HEIGHT, NUM_ZOMBIES, NUM_OBSTACLES, RANDOM_SEED, MAX_STEPS
+from config.config import GRID_WIDTH, GRID_HEIGHT, NUM_ZOMBIES, NUM_OBSTACLES, RANDOM_SEED, MAX_STEPS, INITIAL_HEALTH, SAFE_ZONE_MIN_DIST_FROM_SPAWN, NUM_SAFE_ZONES
 
 
 class ZombieSurvivalModel(Model):
     """
     Mesa model for the zombie survival grid world.
 
-    The safe zone exists from the beginning, but survivors do not know its
-    location until it is discovered through vision or Scout scan.
+    Multiple safe zones are placed randomly across the map, far from the
+    survivor spawn area. Survivors do not know the locations until discovered
+    through vision or Scout scan.
     """
 
     def __init__(
@@ -31,6 +30,8 @@ class ZombieSurvivalModel(Model):
         team_mode="baseline",
         seed=RANDOM_SEED,
         adaptive_policy=None,
+        num_safe_zones=NUM_SAFE_ZONES,
+        safe_zone_min_dist=SAFE_ZONE_MIN_DIST_FROM_SPAWN,
     ):
         super().__init__(rng=seed)
 
@@ -42,6 +43,8 @@ class ZombieSurvivalModel(Model):
         self.team_mode = team_mode
         self.adaptive_policy = adaptive_policy
         self.initial_health = INITIAL_HEALTH
+        self.num_safe_zones = num_safe_zones
+        self.safe_zone_min_dist = safe_zone_min_dist
 
         # ==============================
         # Agent perception / behaviour ranges
@@ -78,17 +81,8 @@ class ZombieSurvivalModel(Model):
         self.grid = MultiGrid(width, height, torus=False)
 
         # ==============================
-        # Safe zone and initial positions
+        # Survivor spawn positions (bottom-left corner)
         # ==============================
-
-        self.safe_zone_positions = [
-            (width - 2, height - 2),
-            (width - 1, height - 2),
-            (width - 2, height - 1),
-            (width - 1, height - 1),
-        ]
-        self.safe_zone_pos = (width - 1, height - 1)
-        self.safe_zone_agents = []
 
         self.start_positions = [
             (1, 1),  # Scout
@@ -96,13 +90,22 @@ class ZombieSurvivalModel(Model):
             (0, 0),  # Support
         ]
 
+        # ==============================
+        # Safe zones (generated randomly, far from spawn)
+        # ==============================
+
+        self.safe_zone_positions = []
+        self.safe_zone_centers = []
+        self.safe_zone_pos = None
+        self.safe_zone_agents = []
+
         self.current_step = 0
         self.finished = False
         self.cooperation_events = 0
         self.sum_avg_distance = 0
         self.count_avg = 0
 
-        self.create_safe_zone()
+        self.create_safe_zones()
         self.create_obstacles()
         self.create_survivor_team()
         self.create_zombies()
@@ -111,18 +114,79 @@ class ZombieSurvivalModel(Model):
     # World creation
     # ==============================
 
-    def create_safe_zone(self):
-        for pos in self.safe_zone_positions:
-            safe_zone = SafeZoneAgent(self)
-            self.grid.place_agent(safe_zone, pos)
-            self.safe_zone_agents.append(safe_zone)
+    def _candidate_safe_zone_cluster(self):
+        """
+        Returns a random 2x2 cluster anchor (top-left cell) that:
+        - fits fully inside the grid;
+        - is far enough from all survivor spawn positions;
+        - does not overlap any already-placed safe zone cell;
+        
+        Returns (anchor_x, anchor_y) or None after many failed attempts.
+        """
+        max_tries = 2000
+        for _ in range(max_tries):
+            # Anchor is top-left of the 2x2 cluster
+            ax = self.random.randrange(0, self.width - 1)
+            ay = self.random.randrange(0, self.height - 1)
+ 
+            cluster = [
+                (ax, ay),
+                (ax + 1, ay),
+                (ax, ay + 1),
+                (ax + 1, ay + 1),
+            ]
+ 
+            # Must be far enough from every spawn position
+            too_close = any(
+                manhattan_distance(cell, spawn) < self.safe_zone_min_dist
+                for cell in cluster
+                for spawn in self.start_positions
+            )
+            if too_close:
+                continue
+ 
+            # Must not overlap existing safe zone cells
+            if any(cell in self.safe_zone_positions for cell in cluster):
+                continue
+ 
+            # Must not be out of bounds
+            if any(
+                self.grid.out_of_bounds(cell) for cell in cluster
+            ):
+                continue
+ 
+            return cluster
+ 
+        return None  # give up — should not happen on a 35x35 grid
+ 
+    def create_safe_zones(self):
+        for _ in range(self.num_safe_zones):
+            cluster = self._candidate_safe_zone_cluster()
+ 
+            if cluster is None:
+                # Could not place this safe zone — skip silently
+                continue
+ 
+            center = cluster[2]  # bottom-left cell as the "deep" target
+            self.safe_zone_centers.append(center)
+ 
+            for pos in cluster:
+                self.safe_zone_positions.append(pos)
+                agent = SafeZoneAgent(self)
+                self.grid.place_agent(agent, pos)
+                self.safe_zone_agents.append(agent)
+ 
+        # Backwards-compat: pick any safe zone position as the canonical one.
+        # Agents use self.safe_zone_pos only as a last-resort reference.
+        if self.safe_zone_positions:
+            self.safe_zone_pos = self.safe_zone_positions[-1]
 
     def create_obstacles(self):
         created = 0
 
         while created < self.num_obstacles:
             pos = self.random_empty_position(
-                forbidden_positions=set(self.start_positions)
+                forbidden_positions=set(self.start_positions + self.safe_zone_positions)
             )
 
             obstacle = ObstacleAgent(self)
@@ -150,7 +214,7 @@ class ZombieSurvivalModel(Model):
         created = 0
 
         while created < self.num_zombies:
-            pos = self.random_empty_position(forbidden_positions=set())
+            pos = self.random_empty_position(forbidden_positions=set(self.safe_zone_positions))
 
             zombie = ZombieAgent(self)
             self.grid.place_agent(zombie, pos)
@@ -225,6 +289,13 @@ class ZombieSurvivalModel(Model):
             return None
 
         return min(zombies, key=lambda zombie: manhattan_distance(pos, zombie.pos))
+    
+    def nearest_safe_zone_pos(self, from_pos):
+        """Returns the closest discovered safe zone cell to from_pos."""
+        candidates = self.discovered_safe_zone_positions or self.safe_zone_positions
+        if not candidates:
+            return self.safe_zone_pos
+        return min(candidates, key=lambda p: manhattan_distance(from_pos, p))
 
     # ==============================
     # Movement and cell checks
