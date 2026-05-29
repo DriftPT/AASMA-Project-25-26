@@ -101,7 +101,9 @@ class ZombieSurvivalModel(Model):
 
         self.current_step = 0
         self.finished = False
-        self.cooperation_events = 0
+        self.attack_events = 0
+        self.heal_events = 0
+        self.scan_events = 0
         self.sum_avg_distance = 0
         self.count_avg = 0
 
@@ -109,6 +111,18 @@ class ZombieSurvivalModel(Model):
         self.create_obstacles()
         self.create_survivor_team()
         self.create_zombies()
+
+    @property
+    def cooperation_events(self):
+        """Total cooperation events (backwards compat)."""
+        return self.attack_events + self.heal_events + self.scan_events
+
+    @property
+    def cooperation_rate(self):
+        """Cooperation events per step — comparable across runs of different length."""
+        if self.current_step == 0:
+            return 0.0
+        return self.cooperation_events / self.current_step
 
     # ==============================
     # World creation

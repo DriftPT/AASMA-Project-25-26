@@ -45,16 +45,15 @@ def load_image(name):
 
     return IMAGE_CACHE[name]
 
-def draw_image(ax, image_name, x, y, zoom=0.12):
+def draw_image(ax, image_name, x, y, zoom=0.045):
     """
     Draws a cached image centered on a grid position.
     The image is loaded only once to avoid memory problems.
     """
-    img = load_image(image_name)
 
+    img = load_image(image_name)
     if img is None:
         return
-
     image = OffsetImage(img, zoom=zoom)
     box = AnnotationBbox(image, (x, y), frameon=False)
     ax.add_artist(box)
@@ -86,15 +85,6 @@ def health_bar_dims(grid_size: int):
 def font_size(grid_size: int, base: float = 8.0) -> float:
     """Font size for text labels on the grid."""
     return max(4.0, base * _scale(grid_size))
- 
- 
-def draw_image(ax, image_name, x, y, zoom=0.045):
-    img = load_image(image_name)
-    if img is None:
-        return
-    image = OffsetImage(img, zoom=zoom)
-    box = AnnotationBbox(image, (x, y), frameon=False)
-    ax.add_artist(box)
 
 # ==============================
 # GLOBAL REACTIVE STATE
@@ -434,6 +424,10 @@ def SurvivorPanel():
     hp_ratio = total_hp / max_hp if max_hp > 0 else 0
     team_hp_color = health_color(hp_ratio)
     coop = model.cooperation_events
+    attack_ev = model.attack_events
+    heal_ev = model.heal_events
+    scan_ev = model.scan_events
+    coop_rate = model.cooperation_rate
 
     if not survivors:
         cards_html = "<div style='color:#94a3b8;font-size:13px;text-align:center;padding:24px 0;'>☠️ All survivors eliminated</div>"
@@ -457,8 +451,22 @@ def SurvivorPanel():
       <div style="font-size:18px;font-weight:700;color:#16a34a;">{safe_count}</div>
     </div>
     <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:8px 10px;">
-      <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;">Cooperations</div>
-      <div style="font-size:18px;font-weight:700;color:#d97706;">{coop}</div>
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;">Coop Rate</div>
+      <div style="font-size:18px;font-weight:700;color:#d97706;">{coop_rate:.2f}<span style="font-size:10px;color:#94a3b8;">/step</span></div>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px;">
+    <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:6px 8px;text-align:center;">
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;">⚔️ Attacks</div>
+      <div style="font-size:15px;font-weight:700;color:#dc2626;">{attack_ev}</div>
+    </div>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:6px 8px;text-align:center;">
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;">💚 Heals</div>
+      <div style="font-size:15px;font-weight:700;color:#16a34a;">{heal_ev}</div>
+    </div>
+    <div style="background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;padding:6px 8px;text-align:center;">
+      <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;">📡 Scans</div>
+      <div style="font-size:15px;font-weight:700;color:#7c3aed;">{scan_ev}</div>
     </div>
   </div>
 </div>
@@ -532,6 +540,10 @@ def Page():
         solara.Markdown(f"**Alive survivors:** {len(model.get_alive_survivors())}")
         solara.Markdown(f"**Alive zombies:** {len(model.get_alive_zombies())}")
         solara.Markdown(f"**Cooperation events:** {model.cooperation_events}")
+        solara.Markdown(f"**↳ Attacks:** {model.attack_events}")
+        solara.Markdown(f"**↳ Heals:** {model.heal_events}")
+        solara.Markdown(f"**↳ Scans:** {model.scan_events}")
+        solara.Markdown(f"**Cooperation rate:** {model.cooperation_rate:.2f}/step")
 
     solara.Markdown("# Ad Hoc Teamwork in a Zombie Survival Grid World")
 

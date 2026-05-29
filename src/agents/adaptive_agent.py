@@ -56,7 +56,9 @@ class AdaptiveAgent(SurvivorAgent):
 
         old_health = self.health
         old_distance_to_safe = self.distance_to_nearest_safe_zone()
-        old_cooperation_events = self.model.cooperation_events
+        old_attack_events = self.model.attack_events
+        old_heal_events = self.model.heal_events
+        old_scan_events = self.model.scan_events
         old_safe_discovered = self.model.safe_zone_discovered
         old_teammate_count = len([s for s in self.model.get_alive_survivors() if s is not self])
 
@@ -67,7 +69,9 @@ class AdaptiveAgent(SurvivorAgent):
         reward = self.compute_reward(
             old_health=old_health,
             old_distance_to_safe=old_distance_to_safe,
-            old_cooperation_events=old_cooperation_events,
+            old_attack_events=old_attack_events,
+            old_heal_events=old_heal_events,
+            old_scan_events=old_scan_events,
             old_safe_discovered=old_safe_discovered,
             old_teammate_count=old_teammate_count,
         )
@@ -122,8 +126,9 @@ class AdaptiveAgent(SurvivorAgent):
             self.health_bucket(),
             self.safe_distance_bucket(),
             self.zombie_distance_bucket(),
+            self.nearby_zombie_count_bucket(),
             int(self.model.safe_zone_discovered),
-            int(self.closest_injured_teammate() is not None),
+            int(self._injured_teammate_in_heal_range()),
             int(self.team_is_too_far(max_distance=5)),
         )
 
@@ -164,7 +169,7 @@ class AdaptiveAgent(SurvivorAgent):
         return "far"
 
     def nearby_zombie_count_bucket(self):
-        """How many zombies are within vision range"""
+        """How many zombies are within vision range."""
         count = sum(
             1 for z in self.model.get_alive_zombies()
             if manhattan_distance(self.pos, z.pos) <= self.model.vision_range
@@ -175,11 +180,18 @@ class AdaptiveAgent(SurvivorAgent):
             return "few"
         return "many"
 
+    def _injured_teammate_in_heal_range(self) -> bool:
+        """True if there is an injured teammate close enough to heal this step."""
+        injured = self.closest_injured_teammate()
+        if injured is None:
+            return False
+        return manhattan_distance(self.pos, injured.pos) <= self.model.heal_range
+
     def distance_to_nearest_safe_zone(self):
         """Distance to the closest safe zone cell (known or unknown)."""
         if not self.model.safe_zone_positions:
             return self.model.width + self.model.height
- 
+
         return min(
             manhattan_distance(self.pos, safe_pos)
             for safe_pos in self.model.safe_zone_positions
@@ -194,7 +206,9 @@ class AdaptiveAgent(SurvivorAgent):
         *,
         old_health,
         old_distance_to_safe,
-        old_cooperation_events,
+        old_attack_events,
+        old_heal_events,
+        old_scan_events,
         old_safe_discovered,
         old_teammate_count,
     ):
@@ -204,15 +218,19 @@ class AdaptiveAgent(SurvivorAgent):
         Positive reward:
         - getting closer to the safe zone;
         - discovering the safe zone;
-        - cooperating by attacking/healing;
+        - attacking zombies, healing teammates, scanning for the safe zone;
         - reaching the safe zone;
+        - protecting teammates from nearby zombies;
         - team success.
 
         Negative reward:
         - wasting time;
         - moving away from the safe zone;
         - losing health;
-        - dying.
+        - dying;
+        - teammate death.
+
+        Note: scan only rewards while the safe zone is still undiscovered.
         """
 
         reward = -0.1
@@ -222,13 +240,20 @@ class AdaptiveAgent(SurvivorAgent):
         if new_distance_to_safe < old_distance_to_safe:
             reward += 1.0
         elif new_distance_to_safe > old_distance_to_safe:
-            reward -= 0.5
+            reward -= 0.8
 
         if not old_safe_discovered and self.model.safe_zone_discovered:
             reward += 3.0
 
-        if self.model.cooperation_events > old_cooperation_events:
-            reward += 2.0
+        if self.model.attack_events > old_attack_events:
+            reward += 4.0
+
+        if self.model.heal_events > old_heal_events:
+            reward += 5.0
+
+        # scan only rewarded while safe zone still unknown
+        if self.model.scan_events > old_scan_events and not old_safe_discovered:
+            reward += 1.5
 
         if self.health < old_health:
             reward -= 2.0
@@ -236,14 +261,26 @@ class AdaptiveAgent(SurvivorAgent):
         if self.pos in self.model.safe_zone_positions:
             reward += 5.0
 
+        # reward for keeping zombies away from teammates
+        alive_zombies = self.model.get_alive_zombies()
+        alive_teammates = [s for s in self.model.get_alive_survivors() if s is not self]
+        if alive_zombies and alive_teammates:
+            min_threat = min(
+                manhattan_distance(s.pos, z.pos)
+                for s in alive_teammates
+                for z in alive_zombies
+            )
+            if min_threat > self.model.attack_range:
+                reward += 0.5
+
         new_teammate_count = len([s for s in self.model.get_alive_survivors() if s is not self])
         if new_teammate_count < old_teammate_count:
-            reward -= 8.0
+            reward -= 12.0
 
         if self.model.is_successful():
             reward += 20.0
 
         if not self.alive:
             reward -= 20.0
-        
+
         return reward

@@ -72,7 +72,7 @@ class SurvivorAgent(Agent):
             if manhattan_distance(self.pos, zombie.pos) <= self.model.attack_range:
                 zombie.health -= 1
                 self.last_action = Action.ATTACK
-                self.model.cooperation_events += 1
+                self.model.attack_events += 1
 
                 if zombie.health <= 0:
                     zombie.alive = False
@@ -94,7 +94,7 @@ class SurvivorAgent(Agent):
             if survivor.health < survivor.max_health:
                 if manhattan_distance(self.pos, survivor.pos) <= self.model.heal_range:
                     survivor.health = min(survivor.max_health, survivor.health + 1)
-                    self.model.cooperation_events += 1
+                    self.model.heal_events += 1
                     self.last_action = Action.HEAL
                     return True
 
@@ -166,7 +166,7 @@ class SurvivorAgent(Agent):
         if not self.share_safe_zone_cells(scanned_cells):
             return False
 
-        self.model.cooperation_events += 1
+        self.model.scan_events += 1
         return True
 
     def share_safe_zone_cells(self, cells) -> bool:
@@ -597,9 +597,8 @@ class ScoutAgent(SurvivorAgent):
         self.scanning = False
         self.discover_safe_zone_if_visible()
         if not self.model.safe_zone_discovered:
-            self.scout_scan()
-        if self.model.safe_zone_discovered:
-            self.scan_found_safe_zone = True
+            if self.scout_scan():
+                self.scan_found_safe_zone = True
 
         goal = self.get_team_goal()
 
