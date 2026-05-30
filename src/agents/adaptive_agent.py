@@ -118,10 +118,9 @@ class AdaptiveAgent(SurvivorAgent):
 
         return (
             self.health_bucket(),
-            self.safe_distance_bucket(),
             self.zombie_distance_bucket(),
             self.nearby_zombie_count_bucket(),
-            int(self.model.safe_zone_discovered),
+            self.safe_phase_bucket(),
             int(self._injured_teammate_in_heal_range()),
             int(self.team_is_too_far(max_distance=5)),
         )
@@ -135,7 +134,16 @@ class AdaptiveAgent(SurvivorAgent):
 
         return "high"
 
-    def safe_distance_bucket(self):
+    def safe_phase_bucket(self):
+        """
+        Safe-zone phase/distance.
+
+        Before the safe zone is discovered, the agent should not receive distance
+        information about it. This avoids hidden information leakage.
+        """
+        if not self.model.safe_zone_discovered:
+            return "unknown"
+
         distance = self.distance_to_nearest_safe_zone()
 
         if distance <= 4:
@@ -182,13 +190,14 @@ class AdaptiveAgent(SurvivorAgent):
         return manhattan_distance(self.pos, injured.pos) <= self.model.heal_range
 
     def distance_to_nearest_safe_zone(self):
-        """Distance to the closest safe zone cell (known or unknown)."""
-        if not self.model.safe_zone_positions:
+        """Distance to the closest **discovered** safe zone cell."""
+        discovered = self.model.discovered_safe_zone_positions
+        if not discovered:
             return self.model.width + self.model.height
 
         return min(
-            manhattan_distance(self.pos, safe_pos)
-            for safe_pos in self.model.safe_zone_positions
+            manhattan_distance(self.pos, pos)
+            for pos in discovered
         )
 
     # ==========================================================
@@ -231,10 +240,12 @@ class AdaptiveAgent(SurvivorAgent):
 
         new_distance_to_safe = self.distance_to_nearest_safe_zone()
 
-        if new_distance_to_safe < old_distance_to_safe:
-            reward += 1.0
-        elif new_distance_to_safe > old_distance_to_safe:
-            reward -= 0.8
+        # Only reward movement towards the safe zone after it has been discovered.
+        if old_safe_discovered and self.model.safe_zone_discovered:
+            if new_distance_to_safe < old_distance_to_safe:
+                reward += 1.0
+            elif new_distance_to_safe > old_distance_to_safe:
+                reward -= 0.8
 
         if not old_safe_discovered and self.model.safe_zone_discovered:
             reward += 3.0

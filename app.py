@@ -29,7 +29,7 @@ IMAGE_PATHS = {
     "zombie": ASSETS_DIR / "zombie.png",
     "obstacle": ASSETS_DIR / "obstacle.png",
     "safezone": ASSETS_DIR / "safezone.png",
-    "background": ASSETS_DIR / "background.png",
+    "background": ASSETS_DIR / "back.png",
 }
 
 IMAGE_CACHE = {}
@@ -305,8 +305,9 @@ def draw_grid(model):
             ax.scatter(x, y, s=obs_size, marker="s", color="black")
 
         elif isinstance(agent, SafeZoneAgent):
-            ax.scatter(x, y, s=safe_size, marker="P", color="gold")
-            ax.text(x, y, "S", ha="center", va="center", color="black", weight="bold", fontsize=lbl_fs)
+            ax.add_patch(plt.Rectangle((x - 0.5, y - 0.5), 1.0, 1.0, facecolor="#38bdf8", edgecolor="#0369a1",
+                linewidth=2, zorder=2, alpha=0.95))
+            ax.text(x, y, "S", ha="center", va="center", color="black", weight="bold", fontsize=lbl_fs, zorder=3)
 
     return fig
 
