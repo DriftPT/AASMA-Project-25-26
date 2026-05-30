@@ -42,7 +42,6 @@ avg_steps: 99.794
 avg_attack_events: 9.028
 avg_heal_events: 5.646
 avg_scan_events: 0.888
-avg_cooperation_rate: 0.156
 --------------------------------------------------
 Adaptive replaces Scout
 --------------------------------------------------
@@ -52,7 +51,9 @@ avg_steps: 106.748
 avg_attack_events: 11.090
 avg_heal_events: 6.740
 avg_scan_events: 0.662
-avg_cooperation_rate: 0.173
+adaptive_scout_ratio: 0.450
+adaptive_defender_ratio: 0.492
+adaptive_support_ratio: 0.058
 --------------------------------------------------
 Adaptive replaces Defender
 --------------------------------------------------
@@ -62,7 +63,9 @@ avg_steps: 85.060
 avg_attack_events: 6.434
 avg_heal_events: 4.534
 avg_scan_events: 0.910
-avg_cooperation_rate: 0.140
+adaptive_scout_ratio: 0.481
+adaptive_defender_ratio: 0.459
+adaptive_support_ratio: 0.060
 --------------------------------------------------
 Adaptive replaces Support
 --------------------------------------------------
@@ -72,7 +75,9 @@ avg_steps: 79.960
 avg_attack_events: 7.090
 avg_heal_events: 1.300
 avg_scan_events: 0.942
-avg_cooperation_rate: 0.117
+adaptive_scout_ratio: 0.420
+adaptive_defender_ratio: 0.454
+adaptive_support_ratio: 0.126
 --------------------------------------------------
 Adaptive (All Roles)
 --------------------------------------------------
@@ -82,7 +87,9 @@ avg_steps: 74.540
 avg_attack_events: 10.142
 avg_heal_events: 5.472
 avg_scan_events: 0.900
-avg_cooperation_rate: 0.222
+adaptive_scout_ratio: 0.435
+adaptive_defender_ratio: 0.478
+adaptive_support_ratio: 0.087
 
 
 ######################################################################
@@ -97,7 +104,6 @@ avg_steps: 99.794
 avg_attack_events: 9.028
 avg_heal_events: 5.646
 avg_scan_events: 0.888
-avg_cooperation_rate: 0.156
 --------------------------------------------------
 Adaptive replaces Scout
 --------------------------------------------------
@@ -107,7 +113,9 @@ avg_steps: 170.362
 avg_attack_events: 12.280
 avg_heal_events: 9.520
 avg_scan_events: 0.248
-avg_cooperation_rate: 0.129
+adaptive_scout_ratio: 0.162
+adaptive_defender_ratio: 0.015
+adaptive_support_ratio: 0.822
 --------------------------------------------------
 Adaptive replaces Defender
 --------------------------------------------------
@@ -117,7 +125,9 @@ avg_steps: 95.610
 avg_attack_events: 3.106
 avg_heal_events: 14.788
 avg_scan_events: 0.714
-avg_cooperation_rate: 0.195
+adaptive_scout_ratio: 0.363
+adaptive_defender_ratio: 0.168
+adaptive_support_ratio: 0.468
 --------------------------------------------------
 Adaptive replaces Support
 --------------------------------------------------
@@ -127,7 +137,9 @@ avg_steps: 92.154
 avg_attack_events: 7.438
 avg_heal_events: 4.570
 avg_scan_events: 0.886
-avg_cooperation_rate: 0.140
+adaptive_scout_ratio: 0.315
+adaptive_defender_ratio: 0.039
+adaptive_support_ratio: 0.646
 --------------------------------------------------
 Adaptive (All Roles)
 --------------------------------------------------
@@ -137,7 +149,9 @@ avg_steps: 134.896
 avg_attack_events: 10.054
 avg_heal_events: 5.632
 avg_scan_events: 0.380
-avg_cooperation_rate: 0.119
+adaptive_scout_ratio: 0.227
+adaptive_defender_ratio: 0.112
+adaptive_support_ratio: 0.662
 
 
 ######################################################################
@@ -152,7 +166,6 @@ avg_steps: 99.794
 avg_attack_events: 9.028
 avg_heal_events: 5.646
 avg_scan_events: 0.888
-avg_cooperation_rate: 0.156
 --------------------------------------------------
 Adaptive replaces Scout
 --------------------------------------------------
@@ -162,7 +175,9 @@ avg_steps: 104.404
 avg_attack_events: 11.088
 avg_heal_events: 6.606
 avg_scan_events: 0.732
-avg_cooperation_rate: 0.176
+adaptive_scout_ratio: 0.593
+adaptive_defender_ratio: 0.261
+adaptive_support_ratio: 0.146
 --------------------------------------------------
 Adaptive replaces Defender
 --------------------------------------------------
@@ -172,7 +187,9 @@ avg_steps: 88.206
 avg_attack_events: 6.436
 avg_heal_events: 5.196
 avg_scan_events: 0.912
-avg_cooperation_rate: 0.142
+adaptive_scout_ratio: 0.523
+adaptive_defender_ratio: 0.310
+adaptive_support_ratio: 0.167
 --------------------------------------------------
 Adaptive replaces Support
 --------------------------------------------------
@@ -182,7 +199,9 @@ avg_steps: 82.996
 avg_attack_events: 7.360
 avg_heal_events: 1.470
 avg_scan_events: 0.960
-avg_cooperation_rate: 0.118
+adaptive_scout_ratio: 0.486
+adaptive_defender_ratio: 0.275
+adaptive_support_ratio: 0.239
 --------------------------------------------------
 Adaptive (All Roles)
 --------------------------------------------------
@@ -192,7 +211,9 @@ avg_steps: 75.948
 avg_attack_events: 10.526
 avg_heal_events: 5.112
 avg_scan_events: 0.916
-avg_cooperation_rate: 0.218
+adaptive_scout_ratio: 0.528
+adaptive_defender_ratio: 0.272
+adaptive_support_ratio: 0.200
 
 
 ######################################################################
@@ -207,7 +228,6 @@ avg_steps: 99.794
 avg_attack_events: 9.028
 avg_heal_events: 5.646
 avg_scan_events: 0.888
-avg_cooperation_rate: 0.156
 --------------------------------------------------
 Adaptive replaces Scout
 --------------------------------------------------
@@ -217,7 +237,9 @@ avg_steps: 96.048
 avg_attack_events: 10.700
 avg_heal_events: 6.558
 avg_scan_events: 0.786
-avg_cooperation_rate: 0.188
+adaptive_scout_ratio: 0.635
+adaptive_defender_ratio: 0.219
+adaptive_support_ratio: 0.146
 --------------------------------------------------
 Adaptive replaces Defender
 --------------------------------------------------
@@ -227,7 +249,9 @@ avg_steps: 87.670
 avg_attack_events: 6.780
 avg_heal_events: 4.698
 avg_scan_events: 0.928
-avg_cooperation_rate: 0.142
+adaptive_scout_ratio: 0.562
+adaptive_defender_ratio: 0.256
+adaptive_support_ratio: 0.182
 --------------------------------------------------
 Adaptive replaces Support
 --------------------------------------------------
@@ -237,7 +261,9 @@ avg_steps: 94.082
 avg_attack_events: 8.524
 avg_heal_events: 2.596
 avg_scan_events: 0.930
-avg_cooperation_rate: 0.128
+adaptive_scout_ratio: 0.353
+adaptive_defender_ratio: 0.225
+adaptive_support_ratio: 0.422
 --------------------------------------------------
 Adaptive (All Roles)
 --------------------------------------------------
@@ -247,7 +273,9 @@ avg_steps: 77.050
 avg_attack_events: 9.950
 avg_heal_events: 5.188
 avg_scan_events: 0.928
-avg_cooperation_rate: 0.209
+adaptive_scout_ratio: 0.590
+adaptive_defender_ratio: 0.203
+adaptive_support_ratio: 0.207
 
 
 ######################################################################
@@ -262,7 +290,6 @@ avg_steps: 99.794
 avg_attack_events: 9.028
 avg_heal_events: 5.646
 avg_scan_events: 0.888
-avg_cooperation_rate: 0.156
 --------------------------------------------------
 Adaptive replaces Scout
 --------------------------------------------------
@@ -272,7 +299,9 @@ avg_steps: 169.402
 avg_attack_events: 12.594
 avg_heal_events: 9.360
 avg_scan_events: 0.280
-avg_cooperation_rate: 0.131
+adaptive_scout_ratio: 0.150
+adaptive_defender_ratio: 0.028
+adaptive_support_ratio: 0.822
 --------------------------------------------------
 Adaptive replaces Defender
 --------------------------------------------------
@@ -282,7 +311,9 @@ avg_steps: 101.426
 avg_attack_events: 4.048
 avg_heal_events: 13.022
 avg_scan_events: 0.788
-avg_cooperation_rate: 0.176
+adaptive_scout_ratio: 0.379
+adaptive_defender_ratio: 0.187
+adaptive_support_ratio: 0.434
 --------------------------------------------------
 Adaptive replaces Support
 --------------------------------------------------
@@ -292,7 +323,9 @@ avg_steps: 91.562
 avg_attack_events: 7.920
 avg_heal_events: 4.346
 avg_scan_events: 0.900
-avg_cooperation_rate: 0.144
+adaptive_scout_ratio: 0.255
+adaptive_defender_ratio: 0.094
+adaptive_support_ratio: 0.651
 --------------------------------------------------
 Adaptive (All Roles)
 --------------------------------------------------
@@ -302,7 +335,9 @@ avg_steps: 142.644
 avg_attack_events: 11.438
 avg_heal_events: 5.390
 avg_scan_events: 0.536
-avg_cooperation_rate: 0.122
+adaptive_scout_ratio: 0.293
+adaptive_defender_ratio: 0.253
+adaptive_support_ratio: 0.455
 
 
 ######################################################################
@@ -317,7 +352,6 @@ avg_steps: 99.794
 avg_attack_events: 9.028
 avg_heal_events: 5.646
 avg_scan_events: 0.888
-avg_cooperation_rate: 0.156
 --------------------------------------------------
 Adaptive replaces Scout
 --------------------------------------------------
@@ -327,7 +361,9 @@ avg_steps: 184.332
 avg_attack_events: 13.108
 avg_heal_events: 8.498
 avg_scan_events: 0.104
-avg_cooperation_rate: 0.118
+adaptive_scout_ratio: 0.046
+adaptive_defender_ratio: 0.906
+adaptive_support_ratio: 0.048
 --------------------------------------------------
 Adaptive replaces Defender
 --------------------------------------------------
@@ -337,7 +373,9 @@ avg_steps: 93.630
 avg_attack_events: 7.862
 avg_heal_events: 6.034
 avg_scan_events: 0.914
-avg_cooperation_rate: 0.158
+adaptive_scout_ratio: 0.069
+adaptive_defender_ratio: 0.868
+adaptive_support_ratio: 0.064
 --------------------------------------------------
 Adaptive replaces Support
 --------------------------------------------------
@@ -347,7 +385,9 @@ avg_steps: 83.570
 avg_attack_events: 7.854
 avg_heal_events: 2.046
 avg_scan_events: 0.952
-avg_cooperation_rate: 0.130
+adaptive_scout_ratio: 0.146
+adaptive_defender_ratio: 0.666
+adaptive_support_ratio: 0.188
 --------------------------------------------------
 Adaptive (All Roles)
 --------------------------------------------------
@@ -357,4 +397,6 @@ avg_steps: 168.510
 avg_attack_events: 13.082
 avg_heal_events: 7.048
 avg_scan_events: 0.306
-avg_cooperation_rate: 0.121
+adaptive_scout_ratio: 0.062
+adaptive_defender_ratio: 0.861
+adaptive_support_ratio: 0.078
