@@ -18,6 +18,11 @@ class AdaptiveAgent(SurvivorAgent):
         self.current_role = "Adaptive"
         self.next_action = None  # New property to support the on-policy flow (SARSA)
 
+        # Role step counters for metrics
+        self.role_steps_scout = 0
+        self.role_steps_defender = 0
+        self.role_steps_support = 0
+
         if getattr(model, "adaptive_policy", None) is not None:
             self.policy = model.adaptive_policy
         else:
@@ -95,14 +100,17 @@ class AdaptiveAgent(SurvivorAgent):
 
         if action == "scout":
             ScoutAgent.step(self)
+            self.role_steps_scout += 1
 
         elif action == "defender":
             self.explore_target = None
             DefenderAgent.step(self)
+            self.role_steps_defender += 1
 
         elif action == "support":
             self.explore_target = None
             SupportAgent.step(self)
+            self.role_steps_support += 1
 
     # ==========================================================
     # State representation
