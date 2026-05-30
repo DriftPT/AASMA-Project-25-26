@@ -283,7 +283,8 @@ class AdaptiveAgent(SurvivorAgent):
             reward -= 12.0
 
         if self.model.is_successful():
-            reward += 20.0
+            alive = len(self.model.get_alive_survivors())
+            reward += 20.0 + alive * 3.0
 
         if not self.alive:
             reward -= 20.0
