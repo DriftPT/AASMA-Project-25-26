@@ -75,7 +75,7 @@ def print_results(experiment_name: str, results: dict, output_file=None):
     print()
 
 
-def run_comparisons(output_filename="results_rl.out"):
+def run_comparisons(output_filename="results/results_rl.out"):
     master_results = {}
 
     with open(output_filename, 'w', encoding='utf-8') as f:

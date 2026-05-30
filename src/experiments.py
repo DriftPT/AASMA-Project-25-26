@@ -1,5 +1,6 @@
 from src.model import ZombieSurvivalModel
 from src.agents.rl_policy import RLPolicy
+from src.analysis import plot_learning_curve, plot_qtable_heatmap, plot_test_comparisons, plot_role_ratios, plot_events_table
 
 from config.config import (
     GRID_WIDTH,
@@ -77,17 +78,35 @@ def train_adaptive_agent(train_episodes: int = TRAIN_EPISODES):
 
     training_modes = ["adaptive_replaces_scout","adaptive_replaces_defender","adaptive_replaces_support","adaptive_adaptive_adaptive"]
 
+    training_history = []
+
+    print("A iniciar o treino (isto pode demorar um pouco)...")
     for episode in range(train_episodes):
         team_mode = training_modes[episode % len(training_modes)]
 
-        run_episode(
+        episode_result = run_episode(
             team_mode=team_mode,
             seed=RANDOM_SEED + TEST_EPISODES + episode,
             adaptive_policy=policy,
         )
 
+        success_val = getattr(episode_result, "success", getattr(episode_result, "is_success", 0))
+        survivors_val = getattr(episode_result, "survivors", getattr(episode_result, "survivors_count", 0))
+        steps_val = getattr(episode_result, "steps", getattr(episode_result, "total_steps", 0))
+
+        if isinstance(success_val, bool):
+            success_val = 1 if success_val else 0
+
+        training_history.append({
+            "episode": episode,
+            "team_mode": team_mode,
+            "success": success_val, 
+            "survivors": survivors_val,
+            "steps": steps_val
+        })
         policy.decay_epsilon()
-    return policy
+
+    return policy, training_history
 
 def run_experiment(team_mode: str, episodes: int = TEST_EPISODES, adaptive_policy=None,):
     results = []
@@ -107,25 +126,36 @@ def run_experiment(team_mode: str, episodes: int = TEST_EPISODES, adaptive_polic
 def run_all_experiments():
     all_results = {}
 
-    print("=" * 70)
-    print("TRAINING ADAPTIVE AGENT WITH Q-LEARNING")
+    print("A gerar baseline para os gráficos...")
+    baseline_metrics = run_experiment("baseline", adaptive_policy=None)
+    all_results["Baseline: Scout + Defender + Support"] = baseline_metrics
+
+    print("\n" + "=" * 70)
+    print(f"TRAINING ADAPTIVE AGENT WITH {ALGORITHM.upper()}")
     print("=" * 70)
 
-    adaptive_policy = train_adaptive_agent()
+    adaptive_policy, training_history = train_adaptive_agent()
 
     print(
         f"Training finished. "
         f"Learned states: {adaptive_policy.number_of_learned_states()}"
     )
     print()
+
+    plot_learning_curve(training_history, baseline_metrics=baseline_metrics)
+    plot_qtable_heatmap(adaptive_policy.q_table, filename="results/qtable_heatmap.png")
     
     adaptive_policy.set_training(False)
     adaptive_policy.set_epsilon(TEST_EPSILON)
 
     for experiment_name, team_mode in TEAM_MODES.items():
         if team_mode == "baseline":
-            all_results[experiment_name] = run_experiment(team_mode, adaptive_policy=None)
+            continue
         else:
             all_results[experiment_name] = run_experiment(team_mode, adaptive_policy=adaptive_policy)
+
+    plot_test_comparisons(all_results, filename="results/test_comparison.png")
+    plot_role_ratios(all_results, filename="results/role_ratios.png")
+    plot_events_table(all_results, filename="results/events_table.png")
 
     return all_results

@@ -129,7 +129,7 @@ class AdaptiveAgent(SurvivorAgent):
             self.zombie_distance_bucket(),
             self.nearby_zombie_count_bucket(),
             self.safe_phase_bucket(),
-            int(self._injured_teammate_in_heal_range()),
+            int(self.injured_teammate_in_heal_range()),
             int(self.team_is_too_far(max_distance=5)),
         )
 
@@ -190,7 +190,7 @@ class AdaptiveAgent(SurvivorAgent):
             return "few"
         return "many"
 
-    def _injured_teammate_in_heal_range(self) -> bool:
+    def injured_teammate_in_heal_range(self) -> bool:
         """True if there is an injured teammate close enough to heal this step."""
         injured = self.closest_injured_teammate()
         if injured is None:
