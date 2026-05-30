@@ -2,53 +2,36 @@
 
 ## Ad Hoc Teamwork in a Zombie Survival Grid World
 
-This project explores ad hoc teamwork in a multi-agent zombie survival grid world.
+This repository studies ad hoc teamwork in a multi-agent zombie survival grid world.
+An adaptive agent must cooperate with unknown teammates (Scout, Defender, Support) without prior coordination. The environment contains survivor agents, zombies, obstacles, and a safe zone.
 
-The goal is to study how an adaptive autonomous agent can cooperate with unknown teammates without previous coordination. The environment is a grid world with survivor agents, zombies, obstacles, and a safe zone.
-
-Project for Autonomous Agents and Multi-Agent Systems in IST by Francisco Nascimento, Miguel Baptista and Daniel Barbosa.
-
-## Project Idea
-
-A team of survivor agents must survive, avoid or fight zombies, and reach a safe zone.
-
-The survivor team can include different agent profiles:
-
-- **Scout**: focuses on moving safely toward the safe zone.
-- **Defender**: attacks or blocks zombies to protect the team.
-- **Support**: stays close to teammates and heals injured agents.
-- **Adaptive Agent**: an agent that adapts its behaviour to complement the team.
-
-The adaptive agent does not know the roles of its teammates in advance. It observes their actions and estimates whether they behave more like a Scout, Defender, or Support.
+Project authors: Francisco Nascimento, Miguel Baptista and Daniel Barbosa.
 
 ## Project Structure
 
 ```text
 AASMA-Project-25-26/
-│
-├── main.py                         # Runs all experiments without visualization
-├── app.py                          # Mesa/Solara visualization
-├── requirements.txt                # Python dependencies
-├── README.md                       # Instructions
-│
+├── main.py                 # Run experiments (no visualization)
+├── compare_rl.py           # Scripts to compare RL policies
+├── app.py                  # Mesa/Solara visualization
+├── requirements.txt        # Python dependencies
+├── README.md               # This file
 ├── config/
-│   └── config.py                   # Global configuration parameters
-│
-├── src/
-│   ├── model.py                    # Defines the Mesa model and grid environment
-│   ├── experiments.py              # Defines and runs experiment configurations
-│   ├── metrics.py                  # Metrics and result aggregation
-│   ├── utils.py                    # Utility functions, such as grid distance and movement
-│   │
-│   └── agents/
-│       ├── survivor_agents.py      # Scout, Defender and Support agents behaviours
-│       ├── adaptive_agent.py       # Adaptive agent behaviour
-│       ├── q_learning_agent.py     # Q-Learning implementation
-│       ├── zombie_agent.py         # Zombie agent behaviour
-│       └── environment_agents.py   # Obstacles and safe zone
-│
-└── debug.py                        # Debugging script
-
+│   └── config.py           # Global configuration parameters
+├── images/                 # Images used by the app
+├── results/                # Experiment outputs and logs
+└── src/
+		├── model.py            # Mesa model and grid environment
+		├── experiments.py      # Experiment setups and runners
+		├── metrics.py          # Metrics aggregation and helpers
+        ├── analysis.py         # Data analysis to build graphs and charts
+		├── utils.py            # Utility helpers (distance, movement, etc.)
+		└── agents/
+				├── survivor_agents.py    # Scout, Defender, Support behaviours
+				├── adaptive_agent.py     # Adaptive agent implementation
+				├── rl_policy.py          # RL policy / helper code
+				├── zombie_agent.py       # Zombie behaviour
+				└── environment_agents.py # Obstacles, safe zone, and environment actors
 ```
 
 ## Installation and Running the Project
