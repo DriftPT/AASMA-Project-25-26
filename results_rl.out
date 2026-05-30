@@ -1,32 +1,33 @@
+
 ======================================================================
 TRAINING CONFIG: Q-Learning (eps=1.0, decay=0.999)
 ======================================================================
-Training finished. Learned states: 268
+Training finished. Learned states: 228
 
 ======================================================================
 TRAINING CONFIG: SARSA (eps=1.0, decay=0.999)
 ======================================================================
-Training finished. Learned states: 265
+Training finished. Learned states: 224
 
 ======================================================================
 TRAINING CONFIG: Q-Learning (eps=1.0, decay=0.995)
 ======================================================================
-Training finished. Learned states: 262
+Training finished. Learned states: 233
 
 ======================================================================
 TRAINING CONFIG: SARSA (eps=1.0, decay=0.995)
 ======================================================================
-Training finished. Learned states: 270
+Training finished. Learned states: 224
 
 ======================================================================
 TRAINING CONFIG: Q-Learning (eps=0.25, no decay)
 ======================================================================
-Training finished. Learned states: 259
+Training finished. Learned states: 225
 
 ======================================================================
 TRAINING CONFIG: SARSA (eps=0.25, no decay)
 ======================================================================
-Training finished. Learned states: 264
+Training finished. Learned states: 225
 
 
 ######################################################################
@@ -42,56 +43,46 @@ avg_attack_events: 9.028
 avg_heal_events: 5.646
 avg_scan_events: 0.888
 avg_cooperation_rate: 0.156
-avg_distance: 2.815
-
 --------------------------------------------------
 Adaptive replaces Scout
 --------------------------------------------------
-success_rate: 0.862
-avg_survivors: 2.318
-avg_steps: 93.382
-avg_attack_events: 10.382
-avg_heal_events: 5.928
-avg_scan_events: 0.746
-avg_cooperation_rate: 0.183
-avg_distance: 2.502
-
+success_rate: 0.840
+avg_survivors: 2.340
+avg_steps: 106.748
+avg_attack_events: 11.090
+avg_heal_events: 6.740
+avg_scan_events: 0.662
+avg_cooperation_rate: 0.173
 --------------------------------------------------
 Adaptive replaces Defender
 --------------------------------------------------
-success_rate: 0.758
-avg_survivors: 1.588
-avg_steps: 86.480
-avg_attack_events: 5.982
-avg_heal_events: 4.044
-avg_scan_events: 0.906
-avg_cooperation_rate: 0.126
-avg_distance: 3.160
-
+success_rate: 0.780
+avg_survivors: 1.664
+avg_steps: 85.060
+avg_attack_events: 6.434
+avg_heal_events: 4.534
+avg_scan_events: 0.910
+avg_cooperation_rate: 0.140
 --------------------------------------------------
 Adaptive replaces Support
 --------------------------------------------------
-success_rate: 0.840
-avg_survivors: 1.532
-avg_steps: 80.510
-avg_attack_events: 7.182
-avg_heal_events: 1.386
-avg_scan_events: 0.958
-avg_cooperation_rate: 0.118
-avg_distance: 2.748
-
+success_rate: 0.828
+avg_survivors: 1.460
+avg_steps: 79.960
+avg_attack_events: 7.090
+avg_heal_events: 1.300
+avg_scan_events: 0.942
+avg_cooperation_rate: 0.117
 --------------------------------------------------
 Adaptive (All Roles)
 --------------------------------------------------
-success_rate: 0.894
-avg_survivors: 2.382
-avg_steps: 73.782
-avg_attack_events: 9.500
-avg_heal_events: 4.744
-avg_scan_events: 0.926
-avg_cooperation_rate: 0.206
-avg_distance: 2.997
-
+success_rate: 0.918
+avg_survivors: 2.298
+avg_steps: 74.540
+avg_attack_events: 10.142
+avg_heal_events: 5.472
+avg_scan_events: 0.900
+avg_cooperation_rate: 0.222
 
 
 ######################################################################
@@ -107,56 +98,46 @@ avg_attack_events: 9.028
 avg_heal_events: 5.646
 avg_scan_events: 0.888
 avg_cooperation_rate: 0.156
-avg_distance: 2.815
-
 --------------------------------------------------
 Adaptive replaces Scout
 --------------------------------------------------
-success_rate: 0.844
-avg_survivors: 2.396
-avg_steps: 98.956
-avg_attack_events: 10.854
-avg_heal_events: 6.624
-avg_scan_events: 0.798
-avg_cooperation_rate: 0.185
-avg_distance: 2.563
-
+success_rate: 0.616
+avg_survivors: 2.250
+avg_steps: 170.362
+avg_attack_events: 12.280
+avg_heal_events: 9.520
+avg_scan_events: 0.248
+avg_cooperation_rate: 0.129
 --------------------------------------------------
 Adaptive replaces Defender
 --------------------------------------------------
-success_rate: 0.782
-avg_survivors: 1.628
-avg_steps: 87.080
-avg_attack_events: 6.542
-avg_heal_events: 4.834
-avg_scan_events: 0.916
-avg_cooperation_rate: 0.141
-avg_distance: 3.200
-
+success_rate: 0.524
+avg_survivors: 0.770
+avg_steps: 95.610
+avg_attack_events: 3.106
+avg_heal_events: 14.788
+avg_scan_events: 0.714
+avg_cooperation_rate: 0.195
 --------------------------------------------------
 Adaptive replaces Support
 --------------------------------------------------
-success_rate: 0.824
-avg_survivors: 1.446
-avg_steps: 88.720
-avg_attack_events: 7.740
-avg_heal_events: 1.728
-avg_scan_events: 0.960
-avg_cooperation_rate: 0.118
-avg_distance: 2.954
-
+success_rate: 0.740
+avg_survivors: 1.602
+avg_steps: 92.154
+avg_attack_events: 7.438
+avg_heal_events: 4.570
+avg_scan_events: 0.886
+avg_cooperation_rate: 0.140
 --------------------------------------------------
 Adaptive (All Roles)
 --------------------------------------------------
-success_rate: 0.904
-avg_survivors: 2.318
-avg_steps: 78.652
-avg_attack_events: 10.392
-avg_heal_events: 5.266
-avg_scan_events: 0.934
-avg_cooperation_rate: 0.211
-avg_distance: 3.226
-
+success_rate: 0.604
+avg_survivors: 1.462
+avg_steps: 134.896
+avg_attack_events: 10.054
+avg_heal_events: 5.632
+avg_scan_events: 0.380
+avg_cooperation_rate: 0.119
 
 
 ######################################################################
@@ -172,56 +153,46 @@ avg_attack_events: 9.028
 avg_heal_events: 5.646
 avg_scan_events: 0.888
 avg_cooperation_rate: 0.156
-avg_distance: 2.815
-
 --------------------------------------------------
 Adaptive replaces Scout
 --------------------------------------------------
-success_rate: 0.868
-avg_survivors: 2.432
-avg_steps: 99.736
-avg_attack_events: 11.060
-avg_heal_events: 6.960
-avg_scan_events: 0.832
-avg_cooperation_rate: 0.189
-avg_distance: 2.646
-
+success_rate: 0.834
+avg_survivors: 2.368
+avg_steps: 104.404
+avg_attack_events: 11.088
+avg_heal_events: 6.606
+avg_scan_events: 0.732
+avg_cooperation_rate: 0.176
 --------------------------------------------------
 Adaptive replaces Defender
 --------------------------------------------------
-success_rate: 0.792
-avg_survivors: 1.784
-avg_steps: 89.274
-avg_attack_events: 6.724
-avg_heal_events: 5.382
-avg_scan_events: 0.926
-avg_cooperation_rate: 0.146
-avg_distance: 3.368
-
+success_rate: 0.762
+avg_survivors: 1.602
+avg_steps: 88.206
+avg_attack_events: 6.436
+avg_heal_events: 5.196
+avg_scan_events: 0.912
+avg_cooperation_rate: 0.142
 --------------------------------------------------
 Adaptive replaces Support
 --------------------------------------------------
-success_rate: 0.826
-avg_survivors: 1.576
-avg_steps: 89.982
-avg_attack_events: 7.696
-avg_heal_events: 2.150
-avg_scan_events: 0.934
-avg_cooperation_rate: 0.120
-avg_distance: 2.826
-
+success_rate: 0.848
+avg_survivors: 1.512
+avg_steps: 82.996
+avg_attack_events: 7.360
+avg_heal_events: 1.470
+avg_scan_events: 0.960
+avg_cooperation_rate: 0.118
 --------------------------------------------------
 Adaptive (All Roles)
 --------------------------------------------------
-success_rate: 0.900
-avg_survivors: 2.306
-avg_steps: 74.828
-avg_attack_events: 9.090
-avg_heal_events: 4.934
-avg_scan_events: 0.952
-avg_cooperation_rate: 0.200
-avg_distance: 3.344
-
+success_rate: 0.904
+avg_survivors: 2.354
+avg_steps: 75.948
+avg_attack_events: 10.526
+avg_heal_events: 5.112
+avg_scan_events: 0.916
+avg_cooperation_rate: 0.218
 
 
 ######################################################################
@@ -237,56 +208,46 @@ avg_attack_events: 9.028
 avg_heal_events: 5.646
 avg_scan_events: 0.888
 avg_cooperation_rate: 0.156
-avg_distance: 2.815
-
 --------------------------------------------------
 Adaptive replaces Scout
 --------------------------------------------------
-success_rate: 0.878
-avg_survivors: 2.386
-avg_steps: 87.898
-avg_attack_events: 10.460
-avg_heal_events: 6.532
-avg_scan_events: 0.872
-avg_cooperation_rate: 0.203
-avg_distance: 2.634
-
+success_rate: 0.864
+avg_survivors: 2.436
+avg_steps: 96.048
+avg_attack_events: 10.700
+avg_heal_events: 6.558
+avg_scan_events: 0.786
+avg_cooperation_rate: 0.188
 --------------------------------------------------
 Adaptive replaces Defender
 --------------------------------------------------
-success_rate: 0.812
-avg_survivors: 1.794
-avg_steps: 87.408
-avg_attack_events: 6.526
-avg_heal_events: 5.866
-avg_scan_events: 0.926
-avg_cooperation_rate: 0.152
-avg_distance: 3.334
-
+success_rate: 0.810
+avg_survivors: 1.836
+avg_steps: 87.670
+avg_attack_events: 6.780
+avg_heal_events: 4.698
+avg_scan_events: 0.928
+avg_cooperation_rate: 0.142
 --------------------------------------------------
 Adaptive replaces Support
 --------------------------------------------------
-success_rate: 0.810
-avg_survivors: 1.672
-avg_steps: 85.680
-avg_attack_events: 7.474
-avg_heal_events: 2.278
-avg_scan_events: 0.928
-avg_cooperation_rate: 0.125
-avg_distance: 2.833
-
+success_rate: 0.834
+avg_survivors: 1.768
+avg_steps: 94.082
+avg_attack_events: 8.524
+avg_heal_events: 2.596
+avg_scan_events: 0.930
+avg_cooperation_rate: 0.128
 --------------------------------------------------
 Adaptive (All Roles)
 --------------------------------------------------
-success_rate: 0.908
-avg_survivors: 2.398
-avg_steps: 79.552
-avg_attack_events: 9.652
-avg_heal_events: 5.738
-avg_scan_events: 0.962
-avg_cooperation_rate: 0.206
-avg_distance: 3.318
-
+success_rate: 0.930
+avg_survivors: 2.592
+avg_steps: 77.050
+avg_attack_events: 9.950
+avg_heal_events: 5.188
+avg_scan_events: 0.928
+avg_cooperation_rate: 0.209
 
 
 ######################################################################
@@ -302,56 +263,46 @@ avg_attack_events: 9.028
 avg_heal_events: 5.646
 avg_scan_events: 0.888
 avg_cooperation_rate: 0.156
-avg_distance: 2.815
-
 --------------------------------------------------
 Adaptive replaces Scout
 --------------------------------------------------
-success_rate: 0.840
-avg_survivors: 2.320
-avg_steps: 98.018
-avg_attack_events: 10.586
-avg_heal_events: 6.282
-avg_scan_events: 0.760
-avg_cooperation_rate: 0.180
-avg_distance: 2.418
-
+success_rate: 0.654
+avg_survivors: 2.296
+avg_steps: 169.402
+avg_attack_events: 12.594
+avg_heal_events: 9.360
+avg_scan_events: 0.280
+avg_cooperation_rate: 0.131
 --------------------------------------------------
 Adaptive replaces Defender
 --------------------------------------------------
-success_rate: 0.760
-avg_survivors: 1.616
-avg_steps: 85.076
-avg_attack_events: 6.036
-avg_heal_events: 4.372
-avg_scan_events: 0.928
-avg_cooperation_rate: 0.133
-avg_distance: 3.074
-
+success_rate: 0.574
+avg_survivors: 0.818
+avg_steps: 101.426
+avg_attack_events: 4.048
+avg_heal_events: 13.022
+avg_scan_events: 0.788
+avg_cooperation_rate: 0.176
 --------------------------------------------------
 Adaptive replaces Support
 --------------------------------------------------
-success_rate: 0.830
-avg_survivors: 1.454
-avg_steps: 79.748
-avg_attack_events: 6.784
-avg_heal_events: 1.208
-avg_scan_events: 0.956
-avg_cooperation_rate: 0.112
-avg_distance: 2.757
-
+success_rate: 0.758
+avg_survivors: 1.568
+avg_steps: 91.562
+avg_attack_events: 7.920
+avg_heal_events: 4.346
+avg_scan_events: 0.900
+avg_cooperation_rate: 0.144
 --------------------------------------------------
 Adaptive (All Roles)
 --------------------------------------------------
-success_rate: 0.934
-avg_survivors: 2.392
-avg_steps: 74.414
-avg_attack_events: 9.660
-avg_heal_events: 4.756
-avg_scan_events: 0.950
-avg_cooperation_rate: 0.206
-avg_distance: 2.935
-
+success_rate: 0.658
+avg_survivors: 1.564
+avg_steps: 142.644
+avg_attack_events: 11.438
+avg_heal_events: 5.390
+avg_scan_events: 0.536
+avg_cooperation_rate: 0.122
 
 
 ######################################################################
@@ -367,52 +318,43 @@ avg_attack_events: 9.028
 avg_heal_events: 5.646
 avg_scan_events: 0.888
 avg_cooperation_rate: 0.156
-avg_distance: 2.815
-
 --------------------------------------------------
 Adaptive replaces Scout
 --------------------------------------------------
-success_rate: 0.776
-avg_survivors: 2.426
-avg_steps: 141.030
-avg_attack_events: 11.760
-avg_heal_events: 7.568
-avg_scan_events: 0.724
-avg_cooperation_rate: 0.142
-avg_distance: 2.142
-
+success_rate: 0.658
+avg_survivors: 2.278
+avg_steps: 184.332
+avg_attack_events: 13.108
+avg_heal_events: 8.498
+avg_scan_events: 0.104
+avg_cooperation_rate: 0.118
 --------------------------------------------------
 Adaptive replaces Defender
 --------------------------------------------------
-success_rate: 0.758
-avg_survivors: 1.770
-avg_steps: 94.116
-avg_attack_events: 6.950
-avg_heal_events: 5.306
-avg_scan_events: 0.898
-avg_cooperation_rate: 0.140
-avg_distance: 2.850
-
+success_rate: 0.814
+avg_survivors: 1.968
+avg_steps: 93.630
+avg_attack_events: 7.862
+avg_heal_events: 6.034
+avg_scan_events: 0.914
+avg_cooperation_rate: 0.158
 --------------------------------------------------
 Adaptive replaces Support
 --------------------------------------------------
-success_rate: 0.832
-avg_survivors: 1.708
-avg_steps: 81.540
-avg_attack_events: 7.616
-avg_heal_events: 2.104
-avg_scan_events: 0.938
-avg_cooperation_rate: 0.131
-avg_distance: 2.796
-
+success_rate: 0.824
+avg_survivors: 1.598
+avg_steps: 83.570
+avg_attack_events: 7.854
+avg_heal_events: 2.046
+avg_scan_events: 0.952
+avg_cooperation_rate: 0.130
 --------------------------------------------------
 Adaptive (All Roles)
 --------------------------------------------------
-success_rate: 0.838
-avg_survivors: 2.218
-avg_steps: 119.818
-avg_attack_events: 11.272
-avg_heal_events: 5.654
-avg_scan_events: 0.886
-avg_cooperation_rate: 0.149
-avg_distance: 3.459
+success_rate: 0.710
+avg_survivors: 2.150
+avg_steps: 168.510
+avg_attack_events: 13.082
+avg_heal_events: 7.048
+avg_scan_events: 0.306
+avg_cooperation_rate: 0.121
