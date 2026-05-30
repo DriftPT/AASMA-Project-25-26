@@ -53,33 +53,41 @@ class RLPolicy:
 
         return rng.choice(best_actions)
 
-    def update(self, state, action, reward, next_state, next_action=None):
+    def update(self, state, action, reward, next_state, next_action=None, done=False):
         """
         Applies the selected update rule (Q-learning or SARSA).
+
+        If done=True, the next state is terminal, so V(s') = 0.
         """
         if not self.training:
             return
 
         self.ensure_state_exists(state)
-        self.ensure_state_exists(next_state)
 
         current_q = self.q_table[state][action]
 
-        if self.algorithm == "q_learning":
-            # Uses the optimal estimate (best possible action in the next state)
-            target_q = max(self.q_table[next_state].values())
-            
-        elif self.algorithm == "sarsa":
-            # Uses the action that the epsilon-greedy policy actually chose
-            if next_action is None:
-                raise ValueError("SARSA algorithm requires the 'next_action' parameter.")
-            target_q = self.q_table[next_state][next_action]
-            
-        else:
-            raise ValueError(f"Unknown algorithm: {self.algorithm}")
+        if done:
+            target = reward
 
-        # Generic update formula (TD target)
-        new_q = current_q + self.alpha * (reward + self.gamma * target_q - current_q)
+        else:
+            self.ensure_state_exists(next_state)
+
+            if self.algorithm == "q_learning":
+                # Off-policy: use the best possible next action.
+                next_value = max(self.q_table[next_state].values())
+
+            elif self.algorithm == "sarsa":
+                # On-policy: use the action actually selected by the policy.
+                if next_action is None:
+                    raise ValueError("SARSA algorithm requires 'next_action' when done=False.")
+                next_value = self.q_table[next_state][next_action]
+
+            else:
+                raise ValueError(f"Unknown algorithm: {self.algorithm}")
+
+            target = reward + self.gamma * next_value
+
+        new_q = current_q + self.alpha * (target - current_q)
 
         self.q_table[state][action] = new_q
 

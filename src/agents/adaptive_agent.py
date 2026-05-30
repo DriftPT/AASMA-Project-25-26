@@ -72,8 +72,16 @@ class AdaptiveAgent(SurvivorAgent):
         )
 
         state_after = self.get_state()
-        # Choose the next action A_t+1 (required to compute the SARSA update now)
-        chosen_next_action = self.policy.choose_action(state=state_after, rng=self.model.random)
+
+        done = self.model.finished or not self.alive
+
+        if done:
+            chosen_next_action = None
+        else:
+            chosen_next_action = self.policy.choose_action(
+                state=state_after,
+                rng=self.model.random,
+            )
 
         self.policy.update(
             state=state_before,
@@ -81,7 +89,9 @@ class AdaptiveAgent(SurvivorAgent):
             reward=reward,
             next_state=state_after,
             next_action=chosen_next_action,
+            done=done,
         )
+
         self.next_action = chosen_next_action
 
     # ==========================================================
