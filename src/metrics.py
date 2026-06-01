@@ -35,7 +35,7 @@ def collect_episode_result(model) -> EpisodeResult:
 
     return EpisodeResult(
         success=model.is_successful(),
-        survivors=len(model.get_alive_survivors()),
+        survivors=len(model.get_all_survivors()),
         steps=model.current_step,
         attack_events=model.attack_events,
         heal_events=model.heal_events,

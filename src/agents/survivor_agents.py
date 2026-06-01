@@ -106,44 +106,14 @@ class SurvivorAgent(Agent):
 
     def check_safe_zone(self):
         if self.pos in self.model.safe_zone_positions:
+            safe_zone_pos = self.pos
             self.reached_safe_zone = True
-
-    def move_deeper_into_safe_zone(self):
-        """Move toward the deepest cell of the nearest safe zone cluster."""
-        if self.pos not in self.model.safe_zone_positions:
-            return
-
-        # Find the cluster centre closest to current position
-        nearest_center = closest_position(self.pos, self.model.safe_zone_centers)
-        if nearest_center is None:
-            self.last_action = Action.WAIT
-            return
-        
-        current_distance = manhattan_distance(self.pos, nearest_center)
-
-        candidates = [
-            pos for pos in grid_neighbours(self.pos)
-            if pos in self.model.safe_zone_positions
-            and self.model.can_move_to(pos, moving_agent=self)
-        ]
-
-        deeper_candidates = [
-            pos for pos in candidates
-            if manhattan_distance(pos, nearest_center) < current_distance
-        ]
-
-        if not deeper_candidates:
-            self.last_action = Action.WAIT
-            return
-        best_pos = closest_position(nearest_center, deeper_candidates)
-        self.move_to(best_pos)
+            self.model.grid.remove_agent(self)
+            self.pos = safe_zone_pos
 
     def stay_if_reached_safe_zone(self) -> bool:
-        if self.pos in self.model.safe_zone_positions:
-            self.reached_safe_zone = True
-            self.move_deeper_into_safe_zone()
+        if self.reached_safe_zone:
             return True
-
         return False
 
     def discover_safe_zone_if_visible(self) -> bool:

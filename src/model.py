@@ -95,8 +95,6 @@ class ZombieSurvivalModel(Model):
         # ==============================
 
         self.safe_zone_positions = []
-        self.safe_zone_centers = []
-        self.safe_zone_pos = None
         self.safe_zone_agents = []
 
         self.current_step = 0
@@ -180,19 +178,11 @@ class ZombieSurvivalModel(Model):
                 # Could not place this safe zone — skip silently
                 continue
  
-            center = cluster[2]  # bottom-left cell as the "deep" target
-            self.safe_zone_centers.append(center)
- 
             for pos in cluster:
                 self.safe_zone_positions.append(pos)
                 agent = SafeZoneAgent(self)
                 self.grid.place_agent(agent, pos)
                 self.safe_zone_agents.append(agent)
- 
-        # Backwards-compat: pick any safe zone position as the canonical one.
-        # Agents use self.safe_zone_pos only as a last-resort reference.
-        if self.safe_zone_positions:
-            self.safe_zone_pos = self.safe_zone_positions[-1]
 
     def create_obstacles(self):
         created = 0
@@ -258,6 +248,15 @@ class ZombieSurvivalModel(Model):
             agent for agent in self.agents
             if isinstance(agent, (ScoutAgent, DefenderAgent, SupportAgent, AdaptiveAgent))
             and agent.alive
+            and not agent.reached_safe_zone
+        ]
+
+    def get_all_survivors(self):
+        """Includes survivors that reached the safe zone."""
+        return [
+            agent for agent in self.agents
+            if isinstance(agent, (ScoutAgent, DefenderAgent, SupportAgent, AdaptiveAgent))
+            and agent.alive
         ]
 
     def get_alive_zombies(self):
@@ -284,13 +283,6 @@ class ZombieSurvivalModel(Model):
 
         return min(zombies, key=lambda zombie: manhattan_distance(pos, zombie.pos))
     
-    def nearest_safe_zone_pos(self, from_pos):
-        """Returns the closest discovered safe zone cell to from_pos."""
-        candidates = self.discovered_safe_zone_positions or self.safe_zone_positions
-        if not candidates:
-            return self.safe_zone_pos
-        return min(candidates, key=lambda p: manhattan_distance(from_pos, p))
-
     # ==============================
     # Movement and cell checks
     # ==============================
@@ -328,14 +320,14 @@ class ZombieSurvivalModel(Model):
     # ==============================
 
     def is_successful(self):
-        alive_survivors = self.get_alive_survivors()
+        all_survivors = self.get_all_survivors()
 
-        if len(alive_survivors) == 0:
+        if len(all_survivors) == 0:
             return False
 
         return all(
-            survivor.pos in self.safe_zone_positions
-            for survivor in alive_survivors
+            survivor.reached_safe_zone
+            for survivor in all_survivors
         )
 
     def update_finished_status(self):
@@ -343,7 +335,7 @@ class ZombieSurvivalModel(Model):
             self.finished = True
             return
 
-        if len(self.get_alive_survivors()) == 0:
+        if len(self.get_all_survivors()) == 0:
             self.finished = True
             return
 

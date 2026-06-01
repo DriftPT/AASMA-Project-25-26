@@ -411,6 +411,25 @@ def agent_card_html(agent) -> str:
 """
 
 
+def safe_zone_card_html(agent) -> str:
+    role = getattr(agent, "role_name", "Adaptive")
+    c = ROLE_COLORS.get(role, ROLE_COLORS["Adaptive"])
+    return f"""
+<div style="background:#f0fdf4;border:1px solid #86efac;border-radius:10px;
+     padding:10px 14px;margin-bottom:8px;font-family:system-ui,sans-serif;
+     opacity:0.85;">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <span style="color:{c['accent']};font-weight:700;font-size:14px;">
+      {c['icon']} {role}
+    </span>
+    <span style="background:#dcfce7;color:#15803d;font-size:10px;
+      padding:2px 8px;border-radius:20px;border:1px solid #86efac;
+      font-weight:700;">✓ Safe Zone</span>
+  </div>
+</div>
+"""
+
+
 @solara.component
 def SurvivorPanel():
     # Subscribe to refresh_counter so this re-renders on every step/play tick
@@ -418,22 +437,23 @@ def SurvivorPanel():
     model = model_state.value
 
     survivors = model.get_alive_survivors()
+    safe_survivors = [a for a in model.get_all_survivors() if a.reached_safe_zone]
     alive = len(survivors)
     total_hp = sum(a.health for a in survivors)
     max_hp = sum(a.max_health for a in survivors)
-    safe_count = sum(1 for a in survivors if getattr(a, "reached_safe_zone", False))
+    safe_count = len(safe_survivors)
     hp_ratio = total_hp / max_hp if max_hp > 0 else 0
     team_hp_color = health_color(hp_ratio)
-    coop = model.cooperation_events
     attack_ev = model.attack_events
     heal_ev = model.heal_events
     scan_ev = model.scan_events
-    coop_rate = model.cooperation_rate
 
-    if not survivors:
+    if not survivors and not safe_survivors:
         cards_html = "<div style='color:#94a3b8;font-size:13px;text-align:center;padding:24px 0;'>☠️ All survivors eliminated</div>"
     else:
         cards_html = "".join(agent_card_html(a) for a in survivors)
+        if safe_survivors:
+            cards_html += "".join(safe_zone_card_html(a) for a in safe_survivors)
 
     footer_html = f"""
 <div style="border-top:1px solid #e2e8f0;margin-top:4px;padding-top:10px;font-family:system-ui,sans-serif;">
@@ -441,7 +461,7 @@ def SurvivorPanel():
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
     <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;">
       <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;">Alive</div>
-      <div style="font-size:18px;font-weight:700;color:#1e293b;">{alive}</div>
+      <div style="font-size:18px;font-weight:700;color:#1e293b;">{alive + safe_count}</div>
     </div>
     <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:8px 10px;">
       <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;">Team HP</div>
@@ -450,10 +470,6 @@ def SurvivorPanel():
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 10px;">
       <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;">In Safe Zone</div>
       <div style="font-size:18px;font-weight:700;color:#16a34a;">{safe_count}</div>
-    </div>
-    <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:8px 10px;">
-      <div style="font-size:10px;color:#94a3b8;margin-bottom:2px;">Coop Rate</div>
-      <div style="font-size:18px;font-weight:700;color:#d97706;">{coop_rate:.2f}<span style="font-size:10px;color:#94a3b8;">/step</span></div>
     </div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:6px;">
@@ -536,15 +552,29 @@ def Page():
 
         solara.Markdown("## Information")
         solara.Markdown(f"**Step:** {model.current_step}")
-        solara.Markdown(f"**Finished:** {model.finished}")
-        solara.Markdown(f"**Success:** {model.is_successful()}")
-        solara.Markdown(f"**Alive survivors:** {len(model.get_alive_survivors())}")
+
+        if model.finished:
+            success = model.is_successful()
+            if success:
+                status_html = """<div style="background:#dcfce7;border:1px solid #16a34a;border-radius:8px;padding:8px 12px;margin:4px 0;font-family:system-ui,sans-serif;">
+  <span style="color:#15803d;font-weight:700;">✓ Finished</span><br>
+  <span style="color:#15803d;font-weight:700;">🏆 Mission Successful!</span>
+</div>"""
+            else:
+                status_html = """<div style="background:#fee2e2;border:1px solid #dc2626;border-radius:8px;padding:8px 12px;margin:4px 0;font-family:system-ui,sans-serif;">
+  <span style="color:#dc2626;font-weight:700;">✓ Finished</span><br>
+  <span style="color:#dc2626;font-weight:700;">💀 Mission Failed</span>
+</div>"""
+            solara.HTML(tag="div", unsafe_innerHTML=status_html)
+        else:
+            solara.Markdown(f"**Finished:** {model.finished}")
+            solara.Markdown(f"**Success:** {model.is_successful()}")
+
+        solara.Markdown(f"**Alive survivors:** {len(model.get_all_survivors())}")
         solara.Markdown(f"**Alive zombies:** {len(model.get_alive_zombies())}")
-        solara.Markdown(f"**Cooperation events:** {model.cooperation_events}")
         solara.Markdown(f"**↳ Attacks:** {model.attack_events}")
         solara.Markdown(f"**↳ Heals:** {model.heal_events}")
         solara.Markdown(f"**↳ Scans:** {model.scan_events}")
-        solara.Markdown(f"**Cooperation rate:** {model.cooperation_rate:.2f}/step")
 
     solara.Markdown("# Ad Hoc Teamwork in a Zombie Survival Grid World")
 

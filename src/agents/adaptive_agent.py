@@ -59,8 +59,6 @@ class AdaptiveAgent(SurvivorAgent):
 
         self.perform_learned_action(action)
 
-        self.check_safe_zone()
-
         reward = self.compute_reward(
             old_health=old_health,
             old_distance_to_safe=old_distance_to_safe,
@@ -73,7 +71,7 @@ class AdaptiveAgent(SurvivorAgent):
 
         state_after = self.get_state()
 
-        done = self.model.finished or not self.alive
+        done = self.model.finished or not self.alive or self.reached_safe_zone
 
         if done:
             chosen_next_action = None
@@ -301,7 +299,7 @@ class AdaptiveAgent(SurvivorAgent):
             reward -= 12.0
 
         if self.model.is_successful():
-            alive = len(self.model.get_alive_survivors())
+            alive = len(self.model.get_all_survivors())
             reward += 20.0 + alive * 3.0
 
         if not self.alive:
