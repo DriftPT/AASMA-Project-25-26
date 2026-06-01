@@ -131,7 +131,7 @@ def get_adaptive_policy(selected_team_mode):
         return None
 
     if trained_adaptive_policies is None:
-        trained_adaptive_policies = train_adaptive_agent()
+        trained_adaptive_policies, _ = train_adaptive_agent()
 
     return trained_adaptive_policies
 
