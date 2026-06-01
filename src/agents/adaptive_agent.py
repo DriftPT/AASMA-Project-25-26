@@ -274,8 +274,8 @@ class AdaptiveAgent(SurvivorAgent):
         if self.model.heal_events > old_heal_events:
             reward += 5.0
 
-        # scan only rewarded while safe zone still unknown
-        if self.model.scan_events > old_scan_events and not old_safe_discovered:
+        # scan only rewarded when it was it who discovered the safe zone
+        if self.model.scan_events > old_scan_events and not old_safe_discovered and self.model.safe_zone_discovered:
             reward += 1.5
 
         if self.health < old_health:

@@ -162,11 +162,11 @@ class SurvivorAgent(Agent):
 
         self.last_action = Action.SCAN
         self.scanning = True
+        self.model.scan_events += 1
 
         if not self.share_safe_zone_cells(scanned_cells):
             return False
 
-        self.model.scan_events += 1
         return True
 
     def share_safe_zone_cells(self, cells) -> bool:
