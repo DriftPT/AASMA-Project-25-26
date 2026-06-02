@@ -1,3 +1,4 @@
+import gc
 import os
 import time
 import matplotlib.pyplot as plt
@@ -138,6 +139,18 @@ def get_adaptive_policy(selected_team_mode):
 def reset_model():
     is_playing.value = False
 
+    old_model = model_state.value
+    if old_model is not None:
+        for agent in list(old_model.agents):
+            if agent.pos is not None:
+                try:
+                    old_model.grid.remove_agent(agent)
+                except ValueError:
+                    pass 
+        del old_model
+
+    gc.collect()
+
     adaptive_policy = get_adaptive_policy(team_mode.value)
 
     model_state.value = ZombieSurvivalModel(
@@ -173,6 +186,7 @@ def pause_model():
 def shutdown_app():
     is_playing.value = False
     plt.close("all")
+    gc.collect()
     os._exit(0)
 
 # ==============================
