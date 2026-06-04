@@ -168,7 +168,7 @@ class ZombieSurvivalModel(Model):
  
             return cluster
  
-        return None  # give up — should not happen on a 35x35 grid
+        return None  # give up — should not happen on a 30x30 grid
  
     def create_safe_zones(self):
         for _ in range(self.num_safe_zones):
