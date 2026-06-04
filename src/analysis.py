@@ -2,11 +2,6 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
-import os
-
-# Garante que a pasta para as imagens existe
-if not os.path.exists('results'):
-    os.makedirs('results')
 
 def interpret_state(state):
     """
@@ -332,3 +327,52 @@ def plot_events_table(all_results, filename="results/events_table.png"):
     plt.savefig(filename, dpi=300)
     plt.close()
     print(f"✅ Guardado: {filename}")
+
+def plot_rl_comparison(master_results, filename="results/rl_comparison.png"):
+    """
+    Gera gráficos de barras comparando a Taxa de Sucesso e a Média de Sobreviventes
+    para as diferentes configurações de RL, extraídas do compare_rl.py.
+    """
+    if not master_results:
+        return
+
+    data = []
+    for config, experiments in master_results.items():
+        for exp_name, metrics in experiments.items():
+            if "Baseline" in exp_name: 
+                continue # Ignoramos a baseline para focar apenas nos algoritmos RL
+            
+            # Simplificar nomes para não encavalar no gráfico
+            short_exp = exp_name.replace("Adaptive replaces ", "Adapts ").replace("Adaptive (All Roles)", "Adapts (All)")
+            short_cfg = config.replace("Q-Learning", "QL").replace("SARSA", "Sarsa").replace("decay=", "d=")
+
+            data.append({
+                "Configuração RL": short_cfg,
+                "Cenário": short_exp,
+                "Taxa de Sucesso": metrics.get("success_rate", 0),
+                "Média Sobreviventes": metrics.get("avg_survivors", 0)
+            })
+    
+    df = pd.DataFrame(data)
+    
+    fig, axes = plt.subplots(2, 1, figsize=(14, 12))
+    
+    # Gráfico 1: Taxa de Sucesso
+    sns.barplot(data=df, x="Configuração RL", y="Taxa de Sucesso", hue="Cenário", ax=axes[0], palette="Blues_d")
+    axes[0].set_title("Comparação da Taxa de Sucesso por Configuração RL", fontweight="bold", fontsize=14)
+    axes[0].set_ylim(0.65, 1.05)
+    axes[0].tick_params(axis='x', rotation=15)
+    axes[0].legend(bbox_to_anchor=(1.01, 1), loc='upper left')
+    
+    # Gráfico 2: Média de Sobreviventes
+    sns.barplot(data=df, x="Configuração RL", y="Média Sobreviventes", hue="Cenário", ax=axes[1], palette="Greens_d")
+    axes[1].set_title("Comparação de Sobreviventes por Configuração RL", fontweight="bold", fontsize=14)
+    axes[1].set_ylim(1, 3.2)
+    axes[1].tick_params(axis='x', rotation=15)
+    axes[1].legend(bbox_to_anchor=(1.01, 1), loc='upper left')
+    
+    plt.tight_layout()
+    plt.savefig(filename, dpi=300, bbox_inches='tight')
+    plt.close()
+    print(f"✅ Guardado: {filename}")
+

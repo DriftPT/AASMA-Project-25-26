@@ -1,3 +1,10 @@
+import json
+import os
+import sys
+ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+    
 from config.config import RANDOM_SEED
 from src.agents.rl_policy import RLPolicy
 from src.experiments import (
@@ -75,7 +82,7 @@ def print_results(experiment_name: str, results: dict, output_file=None):
     print()
 
 
-def run_comparisons(output_filename="results/results_rl.out"):
+def run_comparisons(output_filename="../results/results_rl.out"):
     master_results = {}
 
     with open(output_filename, 'w', encoding='utf-8') as f:
@@ -119,6 +126,12 @@ def run_comparisons(output_filename="results/results_rl.out"):
                 print_results(experiment_name, results, output_file=f)
 
     print(f"\nProcesso concluído! Podes ver os resultados no ficheiro: {output_filename}")
+
+    json_path = "../results/master_results.json"
+    with open(json_path, 'w', encoding='utf-8') as json_file:
+        json.dump(master_results, json_file, indent=4)
+        
+    print(f"✅ Dados guardados em {json_path}")
 
 if __name__ == "__main__":
     run_comparisons()

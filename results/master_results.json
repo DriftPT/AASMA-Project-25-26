@@ -1,0 +1,326 @@
+{
+    "Q-Learning (eps=1.0, decay=0.999)": {
+        "Baseline: Scout + Defender + Support": {
+            "success_rate": 0.816,
+            "avg_survivors": 2.174,
+            "avg_steps": 94.224,
+            "avg_attack_events": 8.792,
+            "avg_heal_events": 5.578,
+            "avg_scan_events": 70.498
+        },
+        "Adaptive replaces Scout": {
+            "success_rate": 0.878,
+            "avg_survivors": 2.552,
+            "avg_steps": 99.242,
+            "avg_attack_events": 11.114,
+            "avg_heal_events": 6.822,
+            "avg_scan_events": 32.924,
+            "adaptive_scout_ratio": 0.519277358621167,
+            "adaptive_defender_ratio": 0.3291340762788122,
+            "adaptive_support_ratio": 0.15158856510002078
+        },
+        "Adaptive replaces Defender": {
+            "success_rate": 0.782,
+            "avg_survivors": 1.812,
+            "avg_steps": 82.8,
+            "avg_attack_events": 6.71,
+            "avg_heal_events": 4.81,
+            "avg_scan_events": 71.8,
+            "adaptive_scout_ratio": 0.48162548601530164,
+            "adaptive_defender_ratio": 0.34742255110999626,
+            "adaptive_support_ratio": 0.17095196287470213
+        },
+        "Adaptive replaces Support": {
+            "success_rate": 0.81,
+            "avg_survivors": 1.486,
+            "avg_steps": 81.994,
+            "avg_attack_events": 6.868,
+            "avg_heal_events": 1.27,
+            "avg_scan_events": 59.752,
+            "adaptive_scout_ratio": 0.3761809332951618,
+            "adaptive_defender_ratio": 0.35227598053249354,
+            "adaptive_support_ratio": 0.2715430861723447
+        },
+        "Adaptive (All Roles)": {
+            "success_rate": 0.934,
+            "avg_survivors": 2.572,
+            "avg_steps": 69.428,
+            "avg_attack_events": 9.65,
+            "avg_heal_events": 4.676,
+            "avg_scan_events": 78.228,
+            "adaptive_scout_ratio": 0.47444655281467424,
+            "adaptive_defender_ratio": 0.28589500316255534,
+            "adaptive_support_ratio": 0.2396584440227704
+        }
+    },
+    "SARSA (eps=1.0, decay=0.999)": {
+        "Baseline: Scout + Defender + Support": {
+            "success_rate": 0.816,
+            "avg_survivors": 2.174,
+            "avg_steps": 94.224,
+            "avg_attack_events": 8.792,
+            "avg_heal_events": 5.578,
+            "avg_scan_events": 70.498
+        },
+        "Adaptive replaces Scout": {
+            "success_rate": 0.884,
+            "avg_survivors": 2.584,
+            "avg_steps": 96.042,
+            "avg_attack_events": 10.718,
+            "avg_heal_events": 6.636,
+            "avg_scan_events": 33.486,
+            "adaptive_scout_ratio": 0.5436008828784641,
+            "adaptive_defender_ratio": 0.33549381634726555,
+            "adaptive_support_ratio": 0.1209053007742704
+        },
+        "Adaptive replaces Defender": {
+            "success_rate": 0.784,
+            "avg_survivors": 1.842,
+            "avg_steps": 84.142,
+            "avg_attack_events": 6.88,
+            "avg_heal_events": 5.028,
+            "avg_scan_events": 71.286,
+            "adaptive_scout_ratio": 0.4945927781511578,
+            "adaptive_defender_ratio": 0.3773446569316307,
+            "adaptive_support_ratio": 0.12806256491721146
+        },
+        "Adaptive replaces Support": {
+            "success_rate": 0.814,
+            "avg_survivors": 1.554,
+            "avg_steps": 88.106,
+            "avg_attack_events": 7.352,
+            "avg_heal_events": 1.596,
+            "avg_scan_events": 67.588,
+            "adaptive_scout_ratio": 0.3812958587240393,
+            "adaptive_defender_ratio": 0.32931227459271234,
+            "adaptive_support_ratio": 0.28939186668324834
+        },
+        "Adaptive (All Roles)": {
+            "success_rate": 0.946,
+            "avg_survivors": 2.608,
+            "avg_steps": 68.624,
+            "avg_attack_events": 10.172,
+            "avg_heal_events": 4.876,
+            "avg_scan_events": 78.154,
+            "adaptive_scout_ratio": 0.4681704260651629,
+            "adaptive_defender_ratio": 0.3444862155388471,
+            "adaptive_support_ratio": 0.18734335839598998
+        }
+    },
+    "Q-Learning (eps=1.0, decay=0.995)": {
+        "Baseline: Scout + Defender + Support": {
+            "success_rate": 0.816,
+            "avg_survivors": 2.174,
+            "avg_steps": 94.224,
+            "avg_attack_events": 8.792,
+            "avg_heal_events": 5.578,
+            "avg_scan_events": 70.498
+        },
+        "Adaptive replaces Scout": {
+            "success_rate": 0.838,
+            "avg_survivors": 2.418,
+            "avg_steps": 93.586,
+            "avg_attack_events": 10.302,
+            "avg_heal_events": 6.068,
+            "avg_scan_events": 30.732,
+            "adaptive_scout_ratio": 0.5616691110375172,
+            "adaptive_defender_ratio": 0.31702701424043145,
+            "adaptive_support_ratio": 0.12130387472205138
+        },
+        "Adaptive replaces Defender": {
+            "success_rate": 0.77,
+            "avg_survivors": 1.66,
+            "avg_steps": 85.506,
+            "avg_attack_events": 6.28,
+            "avg_heal_events": 4.19,
+            "avg_scan_events": 69.912,
+            "adaptive_scout_ratio": 0.48737129987129985,
+            "adaptive_defender_ratio": 0.3578667953667954,
+            "adaptive_support_ratio": 0.15476190476190477
+        },
+        "Adaptive replaces Support": {
+            "success_rate": 0.842,
+            "avg_survivors": 1.534,
+            "avg_steps": 77.944,
+            "avg_attack_events": 6.82,
+            "avg_heal_events": 1.308,
+            "avg_scan_events": 64.952,
+            "adaptive_scout_ratio": 0.4135155656795748,
+            "adaptive_defender_ratio": 0.34533029612756266,
+            "adaptive_support_ratio": 0.24115413819286258
+        },
+        "Adaptive (All Roles)": {
+            "success_rate": 0.922,
+            "avg_survivors": 2.42,
+            "avg_steps": 66.9,
+            "avg_attack_events": 9.88,
+            "avg_heal_events": 4.652,
+            "avg_scan_events": 79.276,
+            "adaptive_scout_ratio": 0.4709976798143852,
+            "adaptive_defender_ratio": 0.31366219442482934,
+            "adaptive_support_ratio": 0.2153401257607855
+        }
+    },
+    "SARSA (eps=1.0, decay=0.995)": {
+        "Baseline: Scout + Defender + Support": {
+            "success_rate": 0.816,
+            "avg_survivors": 2.174,
+            "avg_steps": 94.224,
+            "avg_attack_events": 8.792,
+            "avg_heal_events": 5.578,
+            "avg_scan_events": 70.498
+        },
+        "Adaptive replaces Scout": {
+            "success_rate": 0.868,
+            "avg_survivors": 2.592,
+            "avg_steps": 92.578,
+            "avg_attack_events": 10.684,
+            "avg_heal_events": 6.65,
+            "avg_scan_events": 40.04,
+            "adaptive_scout_ratio": 0.612941554271034,
+            "adaptive_defender_ratio": 0.2819203596660244,
+            "adaptive_support_ratio": 0.10513808606294156
+        },
+        "Adaptive replaces Defender": {
+            "success_rate": 0.824,
+            "avg_survivors": 1.936,
+            "avg_steps": 81.358,
+            "avg_attack_events": 6.922,
+            "avg_heal_events": 5.232,
+            "avg_scan_events": 75.822,
+            "adaptive_scout_ratio": 0.546753754256685,
+            "adaptive_defender_ratio": 0.3164182437336013,
+            "adaptive_support_ratio": 0.13682800200971362
+        },
+        "Adaptive replaces Support": {
+            "success_rate": 0.822,
+            "avg_survivors": 1.728,
+            "avg_steps": 90.902,
+            "avg_attack_events": 8.288,
+            "avg_heal_events": 2.586,
+            "avg_scan_events": 80.874,
+            "adaptive_scout_ratio": 0.4114185639229422,
+            "adaptive_defender_ratio": 0.19985989492119088,
+            "adaptive_support_ratio": 0.3887215411558669
+        },
+        "Adaptive (All Roles)": {
+            "success_rate": 0.936,
+            "avg_survivors": 2.64,
+            "avg_steps": 68.678,
+            "avg_attack_events": 9.86,
+            "avg_heal_events": 5.36,
+            "avg_scan_events": 98.062,
+            "adaptive_scout_ratio": 0.5792021259767788,
+            "adaptive_defender_ratio": 0.2671391059508368,
+            "adaptive_support_ratio": 0.15365876807238446
+        }
+    },
+    "Q-Learning (eps=0.25, no decay)": {
+        "Baseline: Scout + Defender + Support": {
+            "success_rate": 0.816,
+            "avg_survivors": 2.174,
+            "avg_steps": 94.224,
+            "avg_attack_events": 8.792,
+            "avg_heal_events": 5.578,
+            "avg_scan_events": 70.498
+        },
+        "Adaptive replaces Scout": {
+            "success_rate": 0.892,
+            "avg_survivors": 2.614,
+            "avg_steps": 89.236,
+            "avg_attack_events": 10.468,
+            "avg_heal_events": 6.534,
+            "avg_scan_events": 35.99,
+            "adaptive_scout_ratio": 0.5578157711095604,
+            "adaptive_defender_ratio": 0.29574319609211447,
+            "adaptive_support_ratio": 0.14644103279832518
+        },
+        "Adaptive replaces Defender": {
+            "success_rate": 0.808,
+            "avg_survivors": 1.916,
+            "avg_steps": 81.224,
+            "avg_attack_events": 6.976,
+            "avg_heal_events": 6.122,
+            "avg_scan_events": 71.82,
+            "adaptive_scout_ratio": 0.4512595159992573,
+            "adaptive_defender_ratio": 0.3599059231292938,
+            "adaptive_support_ratio": 0.1888345608714489
+        },
+        "Adaptive replaces Support": {
+            "success_rate": 0.822,
+            "avg_survivors": 1.618,
+            "avg_steps": 85.108,
+            "avg_attack_events": 7.252,
+            "avg_heal_events": 1.806,
+            "avg_scan_events": 69.952,
+            "adaptive_scout_ratio": 0.4532249873031996,
+            "adaptive_defender_ratio": 0.27689182326053835,
+            "adaptive_support_ratio": 0.26988318943626205
+        },
+        "Adaptive (All Roles)": {
+            "success_rate": 0.934,
+            "avg_survivors": 2.604,
+            "avg_steps": 70.328,
+            "avg_attack_events": 10.312,
+            "avg_heal_events": 5.65,
+            "avg_scan_events": 85.646,
+            "adaptive_scout_ratio": 0.46920032627413066,
+            "adaptive_defender_ratio": 0.3006253587504909,
+            "adaptive_support_ratio": 0.23017431497537838
+        }
+    },
+    "SARSA (eps=0.25, no decay)": {
+        "Baseline: Scout + Defender + Support": {
+            "success_rate": 0.816,
+            "avg_survivors": 2.174,
+            "avg_steps": 94.224,
+            "avg_attack_events": 8.792,
+            "avg_heal_events": 5.578,
+            "avg_scan_events": 70.498
+        },
+        "Adaptive replaces Scout": {
+            "success_rate": 0.84,
+            "avg_survivors": 2.566,
+            "avg_steps": 100.482,
+            "avg_attack_events": 10.79,
+            "avg_heal_events": 6.64,
+            "avg_scan_events": 35.73,
+            "adaptive_scout_ratio": 0.5985290036081043,
+            "adaptive_defender_ratio": 0.22966971967804609,
+            "adaptive_support_ratio": 0.17180127671384957
+        },
+        "Adaptive replaces Defender": {
+            "success_rate": 0.8,
+            "avg_survivors": 1.842,
+            "avg_steps": 80.378,
+            "avg_attack_events": 6.556,
+            "avg_heal_events": 4.54,
+            "avg_scan_events": 68.68,
+            "adaptive_scout_ratio": 0.5080793359102719,
+            "adaptive_defender_ratio": 0.2917432355364045,
+            "adaptive_support_ratio": 0.20017742855332363
+        },
+        "Adaptive replaces Support": {
+            "success_rate": 0.83,
+            "avg_survivors": 1.61,
+            "avg_steps": 82.48,
+            "avg_attack_events": 7.004,
+            "avg_heal_events": 1.416,
+            "avg_scan_events": 63.01,
+            "adaptive_scout_ratio": 0.4824744418944294,
+            "adaptive_defender_ratio": 0.25787606926768203,
+            "adaptive_support_ratio": 0.2596494888378886
+        },
+        "Adaptive (All Roles)": {
+            "success_rate": 0.922,
+            "avg_survivors": 2.54,
+            "avg_steps": 72.754,
+            "avg_attack_events": 10.158,
+            "avg_heal_events": 5.224,
+            "avg_scan_events": 85.202,
+            "adaptive_scout_ratio": 0.5219643722733883,
+            "adaptive_defender_ratio": 0.22146146388754243,
+            "adaptive_support_ratio": 0.25657416383906934
+        }
+    }
+}
