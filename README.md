@@ -3,23 +3,23 @@
 ## Ad Hoc Teamwork in a Zombie Survival Grid World
 
 This repository studies ad hoc teamwork in a multi-agent zombie survival grid world.
-An adaptive agent must cooperate with unknown teammates (Scout, Defender, Support) without prior coordination. The environment contains survivor agents, zombies, obstacles, and a safe zone.
+An adaptive agent must cooperate with unknown teammates (Scout, Defender, Support) without prior coordination. The environment contains survivor agents, zombies, obstacles, and safe zones.
 
-Project authors: Francisco Nascimento, Miguel Baptista and Daniel Barbosa.
+Project authors: Francisco Nascimento, Miguel Baptista and Daniel Bartolomeu.
 
 ## Project Structure
 
 ```text
 AASMA-Project-25-26/
 ├── main.py                 # Run experiments (no visualization)
-├── compare_rl.py           # Scripts to compare RL policies
 ├── app.py                  # Mesa/Solara visualization
 ├── requirements.txt        # Python dependencies
 ├── README.md               # This file
 ├── config/
 │   └── config.py           # Global configuration parameters
 ├── images/                 # Images used by the app
-├── results/                # Experiment outputs and logs
+├── results/                # Experiment outputs and graphs
+├── rl_comparisons/         # Scripts for comparing RL policies
 └── src/
 		├── model.py            # Mesa model and grid environment
 		├── experiments.py      # Experiment setups and runners
@@ -88,7 +88,7 @@ Team: Adaptive + Adaptive + Adaptive
 
 ## Running the Visualization
 
-To run the interactive Mesa/Solara visualization:
+To run the interactive Mesa/Solara visualization (SEED in config.py):
 
 ```bash
 solara run app.py

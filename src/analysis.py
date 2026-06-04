@@ -12,29 +12,29 @@ def interpret_state(state):
     
     desc = []
     
-    # 1. Vida do Agente
-    if hp == 'low': desc.append("HP Crítico")
-    elif hp == 'medium': desc.append("HP Médio")
-    elif hp == 'high': desc.append("HP Alto")
+    # 1. Agent Health
+    if hp == 'low': desc.append("Critical HP")
+    elif hp == 'medium': desc.append("Medium HP")
+    elif hp == 'high': desc.append("High HP")
     
-    # 2 e 3. Ameaça Zombie (Distância e Quantidade)
+    # 2 and 3. Zombie Threat (Distance and Quantity)
     if dist_zom == 'danger': 
-        desc.append(f"Zumbis colados ({count_zom})")
+        desc.append(f"Zombies very close ({count_zom})")
     elif dist_zom == 'near': 
-        desc.append(f"Zumbis perto ({count_zom})")
+        desc.append(f"Zombies nearby ({count_zom})")
     elif dist_zom == 'far': 
-        desc.append(f"Zumbis longe")
+        desc.append(f"Zombies far away")
     
-    # 4. Conhecimento da Base Segura
-    if safe_phase == 'unknown': desc.append("SafeZone Desconhecida")
-    elif safe_phase == 'near': desc.append("SafeZone Perto")
-    elif safe_phase == 'medium' or safe_phase == 'far': desc.append("SafeZone Longe")
+    # 4. Safe Zone Knowledge
+    if safe_phase == 'unknown': desc.append("SafeZone Unknown")
+    elif safe_phase == 'near': desc.append("SafeZone Nearby")
+    elif safe_phase == 'medium' or safe_phase == 'far': desc.append("SafeZone Far")
     
-    # 5. Estado dos Colegas
-    if inj_near == 1: desc.append("Colega Ferido")
+    # 5. Teammates Status
+    if inj_near == 1: desc.append("Injured Teammate")
     
-    # 6. Distância da Equipa
-    if team_far == 1: desc.append("Longe da Equipa")
+    # 6. Distance to Team
+    if team_far == 1: desc.append("Far from Team")
         
     return " | ".join(desc)
 
@@ -45,7 +45,7 @@ def calculate_confidence(q_values_dict):
     mean_val = sum(values) / len(values)
     return max_val - mean_val
 
-def extract_top_states(q_table, top_n=30):
+def extract_top_states(q_table, top_n=15):
     """Extrai e ordena os estados onde o agente tem mais 'certeza' do que fazer."""
     state_metrics = []
     
@@ -70,24 +70,24 @@ def extract_top_states(q_table, top_n=30):
 
 
 def plot_qtable_heatmap(q_table, filename="results/qtable_heatmap.png"):
-    """Gera um Heatmap dos 30 estados mais visitados/decididos."""
-    top_30 = extract_top_states(q_table, top_n=30)
+    """Gera um Heatmap dos 15 estados mais visitados/decididos."""
+    top_15 = extract_top_states(q_table, top_n=15)
     
-    if not top_30:
+    if not top_15:
         print("A Q-table não tem dados suficientes para o Heatmap.")
         return
 
     # Prepara dados para o Pandas
-    index_labels = [interpret_state(item["state_tuple"]) for item in top_30]
-    data = [item["q_values"] for item in top_30]
+    index_labels = [interpret_state(item["state_tuple"]) for item in top_15]
+    data = [item["q_values"] for item in top_15]
     
     df = pd.DataFrame(data, index=index_labels)
     
-    plt.figure(figsize=(10, 12))
+    plt.figure(figsize=(14, 10))
     sns.heatmap(df, annot=True, cmap="YlGnBu", fmt=".2f", linewidths=.5)
-    plt.title("Q-Values para os 30 Estados com Maior Confiança")
-    plt.ylabel("Estado Ocorrido")
-    plt.xlabel("Ações")
+    plt.title("Q-Values for the 15 States with Highest Confidence")
+    plt.ylabel("Observed State")
+    plt.xlabel("Actions")
     plt.tight_layout()
     plt.savefig(filename, dpi=300)
     plt.close()
@@ -114,19 +114,19 @@ def plot_learning_curve(training_history, baseline_metrics=None, out_dir="result
     # Agora só temos 2 subplots em vez de 3
     fig, axes = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
     
-    # Taxa de Sucesso
+    # Success Rate
     sns.lineplot(data=df_geral, x='episode', y='smooth_success', ax=axes[0], color='blue')
-    axes[0].set_title('Taxa de Sucesso ao Longo do Treino (Geral)')
-    axes[0].set_ylabel('Sucesso (0 a 1)')
+    axes[0].set_title('Success Rate Over Training (Overall)')
+    axes[0].set_ylabel('Success (0 to 1)')
     if baseline_metrics and 'success_rate' in baseline_metrics:
         axes[0].axhline(y=baseline_metrics['success_rate'], color='red', linestyle='--', label='Baseline')
         axes[0].legend()
 
-    # Média de Sobreviventes
+    # Average Survivors
     sns.lineplot(data=df_geral, x='episode', y='smooth_survivors', ax=axes[1], color='green')
-    axes[1].set_title('Média de Sobreviventes (Geral)')
-    axes[1].set_ylabel('Sobreviventes (0 a 3)')
-    axes[1].set_xlabel('Episódio de Treino')
+    axes[1].set_title('Average Survivors (Overall)')
+    axes[1].set_ylabel('Survivors (0 to 3)')
+    axes[1].set_xlabel('Training Episode')
     if baseline_metrics and 'avg_survivors' in baseline_metrics:
         axes[1].axhline(y=baseline_metrics['avg_survivors'], color='red', linestyle='--', label='Baseline')
         axes[1].legend()
@@ -152,19 +152,19 @@ def plot_learning_curve(training_history, baseline_metrics=None, out_dir="result
         
         fig, axes = plt.subplots(2, 1, figsize=(10, 10), sharex=True)
         
-        # Taxa de Sucesso
+        # Success Rate
         sns.lineplot(data=df_mode, x='episode', y='smooth_success', ax=axes[0], color='blue')
-        axes[0].set_title(f'Taxa de Sucesso - {mode}')
-        axes[0].set_ylabel('Sucesso (0 a 1)')
+        axes[0].set_title(f'Success Rate - {mode}')
+        axes[0].set_ylabel('Success (0 to 1)')
         if baseline_metrics and 'success_rate' in baseline_metrics:
             axes[0].axhline(y=baseline_metrics['success_rate'], color='red', linestyle='--', label='Baseline')
             axes[0].legend()
 
-        # Média de Sobreviventes
+        # Average Survivors
         sns.lineplot(data=df_mode, x='episode', y='smooth_survivors', ax=axes[1], color='green')
-        axes[1].set_title(f'Média de Sobreviventes - {mode}')
-        axes[1].set_ylabel('Sobreviventes (0 a 3)')
-        axes[1].set_xlabel('Episódio de Treino')
+        axes[1].set_title(f'Average Survivors - {mode}')
+        axes[1].set_ylabel('Survivors (0 to 3)')
+        axes[1].set_xlabel('Training Episode')
         if baseline_metrics and 'avg_survivors' in baseline_metrics:
             axes[1].axhline(y=baseline_metrics['avg_survivors'], color='red', linestyle='--', label='Baseline')
             axes[1].legend()
@@ -196,9 +196,9 @@ def plot_test_comparisons(all_results, filename="results/test_comparison.png"):
         short_name = short_name.replace("Adaptive (All Roles)", "Adapts (All)")
 
         data.append({
-            "Equipas": short_name,
-            "Taxa de Sucesso": metrics.get("success_rate", 0),
-            "Média Sobreviventes": metrics.get("avg_survivors", 0)
+            "Teams": short_name,
+            "Success Rate": metrics.get("success_rate", 0),
+            "Average Survivors": metrics.get("avg_survivors", 0)
         })
         
     df = pd.DataFrame(data)
@@ -207,19 +207,19 @@ def plot_test_comparisons(all_results, filename="results/test_comparison.png"):
     fig, axes = plt.subplots(1, 2, figsize=(14, 6))
     
     # Gráfico 1: Taxa de Sucesso
-    sns.barplot(data=df, x="Taxa de Sucesso", y="Equipas", hue="Equipas", ax=axes[0], palette="Blues_d", legend=False)
-    axes[0].set_title('Comparação da Taxa de Sucesso no Teste Final', fontweight='bold')
+    sns.barplot(data=df, x="Success Rate", y="Teams", hue="Teams", ax=axes[0], palette="Blues_d", legend=False)
+    axes[0].set_title('Success Rate Comparison in Final Test', fontweight='bold')
     axes[0].set_xlim(0, 1.0)
     # Adicionar os valores nas barras
-    for i, v in enumerate(df["Taxa de Sucesso"]):
+    for i, v in enumerate(df["Success Rate"]):
         axes[0].text(v + 0.01, i, f"{v:.2f}", color='black', va='center')
 
     # Gráfico 2: Média de Sobreviventes
-    sns.barplot(data=df, x="Média Sobreviventes", y="Equipas", hue="Equipas", ax=axes[1], palette="Greens_d", legend=False)
-    axes[1].set_title('Comparação de Sobreviventes no Teste Final', fontweight='bold')
+    sns.barplot(data=df, x="Average Survivors", y="Teams", hue="Teams", ax=axes[1], palette="Greens_d", legend=False)
+    axes[1].set_title('Survivor Comparison in Final Test', fontweight='bold')
     axes[1].set_xlim(0, 3.0)
     # Adicionar os valores nas barras
-    for i, v in enumerate(df["Média Sobreviventes"]):
+    for i, v in enumerate(df["Average Survivors"]):
         axes[1].text(v + 0.03, i, f"{v:.2f}", color='black', va='center')
 
     plt.tight_layout()
@@ -253,7 +253,7 @@ def plot_role_ratios(all_results, filename="results/role_ratios.png"):
             support_ratio = (support_ratio / total) * 100
             
         data.append({
-            "Equipas": short_name,
+            "Teams": short_name,
             "Scout": scout_ratio,
             "Defender": defender_ratio,
             "Support": support_ratio
@@ -264,17 +264,17 @@ def plot_role_ratios(all_results, filename="results/role_ratios.png"):
         return
         
     # Usar o pandas para facilitar o gráfico empilhado
-    df = pd.DataFrame(data).set_index("Equipas")
+    df = pd.DataFrame(data).set_index("Teams")
     
     # Gerar o gráfico com cores distintas
     ax = df.plot(kind='bar', stacked=True, figsize=(10, 6), color=['#4c72b0', '#55a868', '#c44e52'], edgecolor='white')
     
-    plt.title('Distribuição de Papéis Escolhidos pelo Agente Adaptativo', fontweight='bold', pad=15)
-    plt.ylabel('Percentagem de Uso (%)')
-    plt.xlabel('Cenários com Adaptativo')
+    plt.title('Role Distribution Chosen by the Adaptive Agent', fontweight='bold', pad=15)
+    plt.ylabel('Usage Percentage (%)')
+    plt.xlabel('Adaptive Scenarios')
     
     # Colocar a legenda fora do gráfico para não tapar as barras
-    plt.legend(title="Papel Assumido", bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.legend(title="Assumed Role", bbox_to_anchor=(1.05, 1), loc='upper left')
     
     # Rodar os labels do eixo X para se lerem melhor
     plt.xticks(rotation=0)
@@ -305,7 +305,7 @@ def plot_events_table(all_results, filename="results/events_table.png"):
             f"{metrics.get('avg_scan_events', 0):.2f}"
         ])
         
-    columns = ["Equipas", "Avg Steps", "Avg Attacks", "Avg Heals", "Avg Scans"]
+    columns = ["Teams", "Avg Steps", "Avg Attacks", "Avg Heals", "Avg Scans"]
     
     fig, ax = plt.subplots(figsize=(10, 4))
     ax.axis('tight')
@@ -322,7 +322,7 @@ def plot_events_table(all_results, filename="results/events_table.png"):
             cell.set_text_props(weight='bold', color='white')
             cell.set_facecolor('#4c72b0')
             
-    plt.title("Resumo de Eventos Médios por Episódio", pad=20, size=14, weight='bold')
+    plt.title("Summary of Average Events per Episode", pad=20, size=14, weight='bold')
     plt.tight_layout()
     plt.savefig(filename, dpi=300)
     plt.close()
@@ -347,10 +347,10 @@ def plot_rl_comparison(master_results, filename="results/rl_comparison.png"):
             short_cfg = config.replace("Q-Learning", "QL").replace("SARSA", "Sarsa").replace("decay=", "d=")
 
             data.append({
-                "Configuração RL": short_cfg,
-                "Cenário": short_exp,
-                "Taxa de Sucesso": metrics.get("success_rate", 0),
-                "Média Sobreviventes": metrics.get("avg_survivors", 0)
+                "RL Configuration": short_cfg,
+                "Scenario": short_exp,
+                "Success Rate": metrics.get("success_rate", 0),
+                "Average Survivors": metrics.get("avg_survivors", 0)
             })
     
     df = pd.DataFrame(data)
@@ -358,15 +358,15 @@ def plot_rl_comparison(master_results, filename="results/rl_comparison.png"):
     fig, axes = plt.subplots(2, 1, figsize=(14, 12))
     
     # Gráfico 1: Taxa de Sucesso
-    sns.barplot(data=df, x="Configuração RL", y="Taxa de Sucesso", hue="Cenário", ax=axes[0], palette="Blues_d")
-    axes[0].set_title("Comparação da Taxa de Sucesso por Configuração RL", fontweight="bold", fontsize=14)
+    sns.barplot(data=df, x="RL Configuration", y="Success Rate", hue="Scenario", ax=axes[0], palette="Blues_d")
+    axes[0].set_title("Success Rate Comparison by RL Configuration", fontweight="bold", fontsize=14)
     axes[0].set_ylim(0.65, 1.05)
     axes[0].tick_params(axis='x', rotation=15)
     axes[0].legend(bbox_to_anchor=(1.01, 1), loc='upper left')
     
     # Gráfico 2: Média de Sobreviventes
-    sns.barplot(data=df, x="Configuração RL", y="Média Sobreviventes", hue="Cenário", ax=axes[1], palette="Greens_d")
-    axes[1].set_title("Comparação de Sobreviventes por Configuração RL", fontweight="bold", fontsize=14)
+    sns.barplot(data=df, x="RL Configuration", y="Average Survivors", hue="Scenario", ax=axes[1], palette="Greens_d")
+    axes[1].set_title("Survivor Comparison by RL Configuration", fontweight="bold", fontsize=14)
     axes[1].set_ylim(1, 3.2)
     axes[1].tick_params(axis='x', rotation=15)
     axes[1].legend(bbox_to_anchor=(1.01, 1), loc='upper left')
